@@ -8,9 +8,12 @@
 <body>
     <h1>Formulario de Carga de Archivos</h1>
     <form id="uploadForm" action="http://127.0.0.1:8000/EnlaceDigna/upload/" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+       
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required>
+        <br>
+        <label for="ID_usuario">IdUsuario:</label>
+        <input type="text" id="id_usuario" name="ID" required>
         <br>
         <label for="archivo">Archivo:</label>
         <input type="file" id="archivo" name="archivo" required>

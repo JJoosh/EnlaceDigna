@@ -4,4 +4,4 @@ from ..models import Ultrasonidos  # Ajusta este importe según la estructura de
 class UltrasonidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ultrasonidos
-        fields = ['id', 'ruta_files', 'usuario', 'tipo_ultrasonido', 'fecha']
+        fields = ['id', 'ruta_files', 'id_usuario', 'tipo_ultrasonido', 'fecha']

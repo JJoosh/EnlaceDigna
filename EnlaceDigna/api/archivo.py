@@ -19,6 +19,6 @@ def subir_archivo_a_s3(archivo, nombre_archivo):
             "ContentType": archivo.content_type
         }
     )
-
+    nombre_archivo=nombre_archivo.replace(' ','+')
     url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{nombre_archivo}"
     return url

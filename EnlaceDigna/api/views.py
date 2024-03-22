@@ -15,9 +15,11 @@ class UltrasonidoUploadAPIView(APIView):
             return Response({"mensaje": "No se encontró archivo para subir."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Suponiendo que necesitas los siguientes datos del request
-        tipo_ultrasonido = request.data.get('tipo_ultrasonido')
-        fecha = request.data.get('fecha')  # Asegúrate de que la fecha se envíe en un formato que Django pueda parsear correctamente
-        id_usuario = request.data.get('id_usuario')  # Asegúrate de que este sea el ID del usuario
+        # tipo_ultrasonido = request.data.get('tipo_ultrasonido')
+        # fecha = request.data.get('fecha')  # Asegúrate de que la fecha se envíe en un formato que Django pueda parsear correctamente
+        id_usuario = request.data.get('ID')  # Asegúrate de que este sea el ID del usuario
+        print("ACA ESTA EL PEDO")
+        print(id_usuario)
 
         nombre_archivo = 'ultrasonidos/' + archivo.name
         ruta_files = subir_archivo_a_s3(archivo, nombre_archivo)  # Asumiendo que esta función retorna la URL del archivo
@@ -26,8 +28,8 @@ class UltrasonidoUploadAPIView(APIView):
         ultrasonido_obj = Ultrasonidos.objects.create(
             ruta_files=ruta_files,
             id_usuario_id=id_usuario,  # Cambio aquí para reflejar la relación FK correctamente
-            tipo_ultrasonido=tipo_ultrasonido,
-            fecha=fecha
+            tipo_ultrasonido="Cancer",
+            fecha='2003-12-02'
         )
         serializer = UltrasonidoSerializer(ultrasonido_obj)  # Asegúrate de que el serializer exista y esté correctamente definido
         

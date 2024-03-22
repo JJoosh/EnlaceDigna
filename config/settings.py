@@ -79,14 +79,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default=''),
+        'NAME': 'prueba2',
+        'USER': 'root',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',   # O la IP del servidor de base de datos si es diferente
+        'PORT': '3306',        # El puerto predeterminado para MySQL es el 3306
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
