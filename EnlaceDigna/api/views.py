@@ -5,7 +5,10 @@ from rest_framework import status
 from ..models import Ultrasonidos  # Asegúrate de ajustar este importe según la ubicación de tu modelo
 from .serializer import UltrasonidoSerializer  # Asegúrate de que el nombre del serializer coincida
 from .archivo import subir_archivo_a_s3  # Ajusta el import según tu estructura de proyecto
+from rest_framework.decorators import api_view
+from ..models import Usuarios
 
+from .archivo import download_archivo
 class UltrasonidoUploadAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -34,3 +37,19 @@ class UltrasonidoUploadAPIView(APIView):
         serializer = UltrasonidoSerializer(ultrasonido_obj)  # Asegúrate de que el serializer exista y esté correctamente definido
         
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def enviar_whathsapp(request, id):
+
+    urls=[]
+
+    url=Ultrasonidos.objects.values_list('ruta_files', flat=True).get(id_usuario=id)
+    nombre=Usuarios.objects.values_list('nombre', flat=True).get(id=id)
+    telfono=Usuarios.objects.values_list('numero_telefono', flat=True).get(id=id)
+    
+    for x in url:
+        urls_separadas=x.split(',')
+        urls[x]=urls_separadas
+    
+    download_archivo(telfono, urls, nombre)

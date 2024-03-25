@@ -7,10 +7,12 @@ class Doctores(models.Model):
 
 class Usuarios(models.Model):
     id=models.AutoField(primary_key=True)
+    nombre=models.CharField(max_length=50, null=True)
     apellido_p=models.CharField(max_length=50)
     apellido_m=models.CharField(max_length=50)
     correo=models.CharField(max_length=70)
     numero_telefono=models.CharField(max_length=12)
+    token=models.CharField(max_length=50, null=True)
 
 class Ultrasonidos(models.Model):
     id = models.AutoField(primary_key=True)
