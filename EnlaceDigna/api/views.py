@@ -7,8 +7,19 @@ from .serializer import UltrasonidoSerializer  # Asegúrate de que el nombre del
 from .archivo import subir_archivo_a_s3  # Ajusta el import según tu estructura de proyecto
 from rest_framework.decorators import api_view
 from ..models import Usuarios
+from .api_whatsapp import message_pedirToken
+import requests
+import json
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from .archivo import verificar_token
+from django.core.cache import cache
 
-from .archivo import download_archivo
+
+from datetime import datetime, timedelta
+
+import hashlib
+
 class UltrasonidoUploadAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -17,9 +28,7 @@ class UltrasonidoUploadAPIView(APIView):
         if archivo is None:
             return Response({"mensaje": "No se encontró archivo para subir."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Suponiendo que necesitas los siguientes datos del request
-        # tipo_ultrasonido = request.data.get('tipo_ultrasonido')
-        # fecha = request.data.get('fecha')  # Asegúrate de que la fecha se envíe en un formato que Django pueda parsear correctamente
+        
         id_usuario = request.data.get('ID')  # Asegúrate de que este sea el ID del usuario
         print("ACA ESTA EL PEDO")
         print(id_usuario)
@@ -39,17 +48,48 @@ class UltrasonidoUploadAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+
 @api_view(['GET'])
-def enviar_whathsapp(request, id):
+def enviar_verificacion(request, token):
 
-    urls=[]
+    Datausuario = get_object_or_404(Usuarios, token=token)
+    numTelefono=Datausuario.numero_telefono
+    nombre=Datausuario.nombre
+    codeArea='52'
+    print(nombre, ' asdasd',  codeArea+numTelefono)                                                      
+    return message_pedirToken(codeArea+numTelefono, nombre)
 
-    url=Ultrasonidos.objects.values_list('ruta_files', flat=True).get(id_usuario=id)
-    nombre=Usuarios.objects.values_list('nombre', flat=True).get(id=id)
-    telfono=Usuarios.objects.values_list('numero_telefono', flat=True).get(id=id)
-    
-    for x in url:
-        urls_separadas=x.split(',')
-        urls[x]=urls_separadas
-    
-    download_archivo(telfono, urls, nombre)
+
+
+@api_view(['POST', 'GET'])
+def recibir_tokenWhats(request):
+    if request.method == "GET":
+        if request.GET.get('hub.verify_token') == "12345":
+            return HttpResponse(request.GET.get('hub.challenge'))
+        else:
+            return Response({"error": "Error de autenticación."}, status=403)
+
+    if request.method == 'POST':
+        data = request.data
+        timestamp_solicitud = datetime.now()
+        if 'entry' in data and data['entry']:
+            entry = data['entry'][0]
+            if 'changes' in entry:
+                change = entry['changes'][0]
+                value = change.get('value', {})
+                messages = value.get('messages', [])
+                if messages:
+                    message = messages[0]
+                    mensaje = message.get('text', {}).get('body')
+                    telefono = message.get('from')
+                    timestamp_mensaje = message.get('timestamp')
+                    if mensaje and telefono and timestamp_mensaje:
+                        timestamp_mensaje = datetime.fromtimestamp(int(timestamp_mensaje))
+                        if timestamp_mensaje >= timestamp_solicitud:
+                            print('Procesando mensaje:', mensaje)
+                            print('Procesando teléfono:', telefono)
+                            return verificar_token(mensaje, telefono)
+                        else:
+                            print('Mensaje recibido antes de la solicitud POST. Ignorando.')
+ 
+        return Response({"status": "success"})
