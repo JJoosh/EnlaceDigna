@@ -83,6 +83,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'prueba',
+       
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',   # O la IP del servidor de base de datos si es diferente
@@ -125,6 +126,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'EnlaceDigna/static',
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -138,3 +144,4 @@ AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN')
 
 
+APPEND_SLASH=False

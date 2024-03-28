@@ -29,7 +29,13 @@ def verificar_token(token, num):
     
 
 
-def subir_archivo_a_s3(archivo, nombre_archivo):
+def subir_archivo_a_s3(archivo, nombre_archivo, token):
+    # Reemplazar espacios en blanco en el nombre del archivo para evitar problemas con la URL
+    nombre_archivo = nombre_archivo.replace(' ', '+')
+
+    # La ruta del archivo en S3 ahora solo incluirá el token como nombre de carpeta
+    ruta_s3 = f"ultrasonidos/{token}/{nombre_archivo}" 
+
     s3 = boto3.client(
         's3',
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -39,14 +45,15 @@ def subir_archivo_a_s3(archivo, nombre_archivo):
     s3.upload_fileobj(
         archivo,
         settings.AWS_STORAGE_BUCKET_NAME,
-        nombre_archivo,
+        ruta_s3,
         ExtraArgs={
             "ACL": "public-read",
             "ContentType": archivo.content_type
         }
     )
-    nombre_archivo=nombre_archivo.replace(' ','+')
-    url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{nombre_archivo}"
+
+    # La URL que se retorna incluirá la ruta completa con el token como carpeta
+    url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{ruta_s3}"
     return url
 
 
