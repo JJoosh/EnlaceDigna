@@ -1,36 +1,61 @@
+from django.forms import ValidationError
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-from ..models import Ultrasonidos  # Asegúrate de ajustar este importe según la ubicación de tu modelo
-from .serializer import UltrasonidoSerializer  # Asegúrate de que el nombre del serializer coincida
-from .archivo import subir_archivo_a_s3  # Ajusta el import según tu estructura de proyecto
+from django.utils import timezone
+from ..models import Ultrasonido, Cliente  # Asumiendo que Cliente está en el mismo lugar que Ultrasonido
+from .serializer import UltrasonidoSerializer
+from .archivo import subir_archivo_a_s3
+import json
+import re
+import logging
 
 class UltrasonidoUploadAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
-        archivo = request.FILES.get('archivo')
-        if archivo is None:
-            return Response({"mensaje": "No se encontró archivo para subir."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Suponiendo que necesitas los siguientes datos del request
-        # tipo_ultrasonido = request.data.get('tipo_ultrasonido')
-        # fecha = request.data.get('fecha')  # Asegúrate de que la fecha se envíe en un formato que Django pueda parsear correctamente
-        id_usuario = request.data.get('ID')  # Asegúrate de que este sea el ID del usuario
-        print("ACA ESTA EL PEDO")
-        print(id_usuario)
+        archivos = request.FILES.getlist('archivo')
+        if not archivos:
+            return Response({"mensaje": "No se encontraron archivos para subir."}, status=status.HTTP_400_BAD_REQUEST)
 
-        nombre_archivo = 'ultrasonidos/' + archivo.name
-        ruta_files = subir_archivo_a_s3(archivo, nombre_archivo)  # Asumiendo que esta función retorna la URL del archivo
+        tipo_ultrasonido = request.data.get('ultrasonido')
+        id_cliente = request.data.get('cliente_id')
+        fecha_actual = timezone.now().date()
+
+        if not tipo_ultrasonido:
+            return Response({"mensaje": "El tipo de ultrasonido es requerido."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Crear instancia del modelo Ultrasonidos con la información proporcionada y guardar
-        ultrasonido_obj = Ultrasonidos.objects.create(
-            ruta_files=ruta_files,
-            id_usuario_id=id_usuario,  # Cambio aquí para reflejar la relación FK correctamente
-            tipo_ultrasonido="Cancer",
-            fecha='2003-12-02'
-        )
-        serializer = UltrasonidoSerializer(ultrasonido_obj)  # Asegúrate de que el serializer exista y esté correctamente definido
-        
+        if not re.match(r'^[A-Za-z\s]+$', tipo_ultrasonido):
+            return Response({"mensaje": "El tipo de ultrasonido contiene caracteres inválidos."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cliente = Cliente.objects.get(id=id_cliente)
+            token_cliente = cliente.Token
+        except Cliente.DoesNotExist:
+            return Response({"mensaje": "Cliente no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Cliente.MultipleObjectsReturned:
+            return Response({"mensaje": "Múltiples clientes encontrados con el mismo ID."}, status=status.HTTP_400_BAD_REQUEST)
+
+        rutas_files = []
+        for archivo in archivos:
+            logging.debug(f"Procesando archivo: {archivo.name}")
+            nombre_archivo_sanitizado = archivo.name.replace(" ", "+")
+            nombre_archivo = f'{nombre_archivo_sanitizado}'  # Directamente el token del cliente como carpeta principal
+            url = subir_archivo_a_s3(archivo, nombre_archivo, token_cliente)  # Asegúrate de que esta función acepte el token como argumento
+            rutas_files.append(url)
+
+        rutas_files_json = json.dumps(rutas_files)
+
+        try:
+            ultrasonido_obj = Ultrasonido.objects.create(
+                ruta_files=rutas_files_json,
+                cliente_id=id_cliente,
+                TipoDeUltrasonidos=tipo_ultrasonido,
+                Fecha=fecha_actual
+            )
+        except ValidationError as e:
+            return Response({"mensaje": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UltrasonidoSerializer(ultrasonido_obj)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
