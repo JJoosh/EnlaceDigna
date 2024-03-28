@@ -48,24 +48,11 @@ data = {
 
 }
 
-
-
-
-
-
-# Define los encabezados de la solicitud
 headers = {
     "Authorization": f"Bearer {access_token}",
     "Content-Type": "application/json"
 }
 
-
-
-# Realiza la solicitud POST
 response = requests.post(url, headers=headers, json=data)
-
-
-
-
 
 print(response.text)

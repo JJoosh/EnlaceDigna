@@ -13,7 +13,7 @@ import json
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .archivo import verificar_token
-from django.core.cache import cache
+
 
 
 from datetime import datetime, timedelta

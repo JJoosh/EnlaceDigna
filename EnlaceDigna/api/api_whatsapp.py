@@ -59,11 +59,8 @@ def enviar_img(telefono, urls):
 
         if response.status_code != 200:
             print(f'Error al enviar la imagen desde {url}: {response.text}')
-            # Si ocurre un error al enviar alguna imagen, puedes decidir cómo manejarlo aquí.
-            # Por ejemplo, puedes registrar el error y continuar con las siguientes imágenes.
-            # Para mantener el ejemplo simple, solo imprimimos el error.
+            
 
-    # Si se enviaron todas las imágenes sin errores, se devuelve una respuesta exitosa.
     return Response({"message": "Todas las imágenes fueron enviadas correctamente"})
 
 
@@ -90,7 +87,6 @@ def enviar_videos(telefono, urls):
             print(f'Error al enviar el video desde {url}: {response.text}')
             
 
-    # Si se enviaron todos los videos sin errores, se devuelve una respuesta exitosa.
     return Response({"message": "Todos los videos fueron enviados correctamente"})
 
 
@@ -165,5 +161,6 @@ def message_pedirToken(telefono, nombre):
     # Maneja la respuesta de requests y devuelve una respuesta adecuada para Django REST Framework
     if response.status_code == 200:
         return Response({"message": "Mensaje enviado correctamente"})
+        
     else:
         return Response({"error": f"Error al enviar el mensaje: {response.text}"}, status=response.status_code)
