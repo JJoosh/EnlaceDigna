@@ -34,7 +34,7 @@ class Doctor(models.Model):
     def __str__(self):
         return self.usuario.Nombre
 
-class Ultrasonido(models.Model):
+class Ultrasonidos(models.Model):
     ruta_files = models.TextField()
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     TipoDeUltrasonidos = models.CharField(max_length=255, null=False)

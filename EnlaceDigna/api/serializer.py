@@ -1,5 +1,6 @@
+import json
 from rest_framework import serializers
-from ..models import Ultrasonido  # Ajusta este importe según la estructura de tu proyecto
+from ..models import Ultrasonidos  # Ajusta este importe según la estructura de tu proyecto
 from rest_framework.fields import ListField
 from ..models import Usuarios
 from ..models import Doctor
@@ -12,7 +13,7 @@ class UltrasonidoSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Ultrasonido
+        model = Ultrasonidos
         fields = ['id', 'ruta_files', 'TipoDeUltrasonidos', 'Fecha', 'cliente_id', 'ruta_files_list']
 
     def get_ruta_files(self, obj):

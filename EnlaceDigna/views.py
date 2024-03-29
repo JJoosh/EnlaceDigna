@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
-from .models import Usuario, Cliente  # Importa correctamente tu modelo Usuario
+from .models import Usuarios, Cliente  # Importa correctamente tu modelo Usuario
+from django.views.decorators.csrf import csrf_protect
 
+
+@csrf_protect
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             # Crear un nuevo usuario con los datos del formulario
-            nuevo_usuario = Usuario(
+            nuevo_usuario = Usuarios(
                 Nombre=form.cleaned_data['name'],
                 Apellido_Paterno=form.cleaned_data['apellido_paterno'],
                 Apellido_Materno=form.cleaned_data.get('apellido_materno', ''),
@@ -24,7 +27,7 @@ def register(request):
 
     return render(request, 'index.html', {'form': form})
 
-
+@csrf_protect
 def dashboard(request):
     query = request.GET.get('search', '')  # Obtiene el parámetro de búsqueda 'search' de la URL, si existe
     clientes_encontrados = Cliente.objects.select_related('usuario')

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% csrf_token %}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
@@ -11,7 +12,7 @@
 <body>
     <div class="form-content">
         <h2>Registrar</h2>
-
+        
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}

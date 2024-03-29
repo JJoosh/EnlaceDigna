@@ -8,7 +8,7 @@ def getURL():
 
 
 def getToken():
-    access_token = "EABPlBU5h77QBOZBW8A6WzXIZCDscLr5jdtph8bEetNMUFLfRBJ1MANPxZBZB9WM0z3iojbYcy6k0z4BAF9lwnAmjvi6C8S6dildlSafuqy2V7jrcJjQNhZBZAA4ZAMwPE6vgzNcCU4py71sMbpiahKMYp7fYLCUZBKOjyep2gbnVTFsxJqUySGAqEhj7MrT4D73QPOujZCNlO0tKfQB8y5y8ZD"
+    access_token = "EABPlBU5h77QBO1XWUJ0wZBAaw0BcqzvATYEdffITjww8ZAAR5rC78m5ENGlczm4QPRuRLZAfk3hYcc4jKp2Kiqg8c7Wk6P8gU4LjaIaQvCRRPvW22wLCXZAfiuJGnxz3RpZBwSiR7oKCn4bGIx9Tqz0s52DZAWuR4TgCHM9xZBnhVWAklayx34kTY2AsbPyBFpbBWRcXfDO7QL0RWR3iyQZD"
     return access_token
 
 
@@ -68,6 +68,7 @@ def enviar_img(telefono, urls):
 
 def enviar_videos(telefono, urls):
     for url in urls:
+        print('enviar_videos:', url)
         data = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
@@ -85,12 +86,13 @@ def enviar_videos(telefono, urls):
 
         if response.status_code != 200:
             print(f'Error al enviar el video desde {url}: {response.text}')
-            
+        else:
+            print('bien video')    
 
     return Response({"message": "Todos los videos fueron enviados correctamente"})
 
 
-def enviar_mensaje(telefono, nombre, apellido):
+def enviar_mensaje(telefono, nombre, apellido, urlsv, urlsi):
     print(telefono)
 
     #AQUI ENVIARA EL MENSAJE PRINCIPAL QUE INICIARA EL ENVIO DE RESULTADOS
@@ -109,8 +111,7 @@ def enviar_mensaje(telefono, nombre, apellido):
         "Content-Type": "application/json"
     }
     response = requests.post(getURL(), headers=headers, json=data)
-    urlsi=['https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/Screenshot-6.png', 'https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/WhatsApp+Image+2024-03-25+at+6.05.53+PM.jpeg', 'https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/abrahamfake.jpeg']
-    urlsv=['https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/ace-mlgfsgw2-ldku4o1d_UD3b6KYh+(1).mp4']
+    
     enviar_videos(telefono, urlsv )
     enviar_img(telefono, urlsi)
     if response.status_code == 200:
@@ -130,23 +131,38 @@ def message_pedirToken(telefono, nombre):
     # Define los datos del cuerpo de la solicitud
     data = {
         "messaging_product": "whatsapp",
-        "to": telefono,
-        "type": "template",
-        "template": {
-            "name": "pedir_confirmacion",
-            "language": {
-                "code": "es_MX",
-                "policy": "deterministic"
-            },
-            "components":[{
-                "type": "body",
-                "parameters": [
-                    {
-                    "type": "text",
-                    "text": nombre
-                    }]
-            }]
-        }
+  "to": telefono,
+  "type": "template",
+  "template": {
+    "name": "enviar_info",
+    "language": {
+      "code": "es_MX"
+    },
+    "components": [
+      {
+        "type": "header",
+        "parameters": [
+          {
+            
+            "type": "image",
+            "image": {
+              "link": "https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/Screenshot-8.png"
+            }
+          }
+        ]
+      },
+      {
+        "type": "body",
+        "parameters": [
+          {
+            "type": "text",
+            "text": nombre
+          }
+        ]
+      }
+    ]
+  }
+
     }
 
     # Define los encabezados de la solicitud

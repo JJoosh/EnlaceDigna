@@ -1,8 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
 from rest_framework import status
-from ..models import Ultrasonidos  # Asegúrate de ajustar este importe según la ubicación de tu modelo
 from .serializer import UltrasonidoSerializer  # Asegúrate de que el nombre del serializer coincida
 from .archivo import subir_archivo_a_s3  # Ajusta el import según tu estructura de proyecto
 from rest_framework.decorators import api_view
@@ -19,12 +17,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
-from ..models import Ultrasonido, Cliente  # Asumiendo que Cliente está en el mismo lugar que Ultrasonido
+from ..models import Ultrasonidos, Cliente  # Asumiendo que Cliente está en el mismo lugar que Ultrasonido
 from .serializer import UltrasonidoSerializer
 from .archivo import subir_archivo_a_s3
 import json
 import re
 import logging
+
 
 
 from datetime import datetime, timedelta
@@ -58,6 +57,7 @@ class UltrasonidoUploadAPIView(APIView):
             return Response({"mensaje": "Múltiples clientes encontrados con el mismo ID."}, status=status.HTTP_400_BAD_REQUEST)
 
         rutas_files = []
+        print(archivos)
         for archivo in archivos:
             logging.debug(f"Procesando archivo: {archivo.name}")
             nombre_archivo_sanitizado = archivo.name.replace(" ", "+")
@@ -68,7 +68,7 @@ class UltrasonidoUploadAPIView(APIView):
         rutas_files_json = json.dumps(rutas_files)
 
         try:
-            ultrasonido_obj = Ultrasonido.objects.create(
+            ultrasonido_obj = Ultrasonidos.objects.create(
                 ruta_files=rutas_files_json,
                 cliente_id=id_cliente,
                 TipoDeUltrasonidos=tipo_ultrasonido,
@@ -82,16 +82,20 @@ class UltrasonidoUploadAPIView(APIView):
 
 
 
-@api_view(['GET'])
-def enviar_verificacion(request, token):
+@api_view(['POST', 'GET'])
+def enviar_verificacion(request, cliente_id):
 
-    Datausuario = get_object_or_404(Usuarios, token=token)
-    numTelefono=Datausuario.numero_telefono
-    nombre=Datausuario.nombre
-    codeArea='52'
-    print(nombre, ' asdasd',  codeArea+numTelefono)                                                      
-    return message_pedirToken(codeArea+numTelefono, nombre)
+   
+    data_cliente = get_object_or_404(Cliente, id=cliente_id)
+    id_usuario = data_cliente.usuario_id
+    print('Este es el id:', id_usuario)
 
+    data_usuario = get_object_or_404(Usuarios, id=id_usuario)
+    num_telefono = data_usuario.NumeroCelular
+    nombre = data_usuario.Nombre
+    codigo_area = '52'
+    print(nombre, ' asdasd',  codigo_area + num_telefono)                                                      
+    return message_pedirToken(codigo_area + num_telefono, nombre)
 
 
 @api_view(['POST', 'GET'])

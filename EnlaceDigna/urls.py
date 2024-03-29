@@ -6,6 +6,6 @@ urlpatterns = [
     path('upload/', UltrasonidoUploadAPIView.as_view(), name='upload'),
     path('registrar/', views.register, name='register'),
     path('dashboard/', views.dashboard, name='dashboard'),
-     path('enviar_whats/<str:token>/', enviar_verificacion, name='enviar_mensaje'),
-    path('recibir_token/', recibir_tokenWhats, name='recibir token')
+    path('enviar_whats/<str:cliente_id>/', enviar_verificacion, name='enviar_mensaje'),
+    path('recibir_token/', recibir_tokenWhats, name='recibir token'),
 ]

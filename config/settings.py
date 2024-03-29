@@ -17,7 +17,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
-    '4fe7-2806-10b7-2-8a0e-f14d-65ef-9fb5-537d.ngrok-free.app',
+    'e8f1-2806-10b7-2-d30b-e19e-fdfc-4b2b-6e5a.ngrok-free.app',
     '127.0.0.1',
 ]
 
@@ -82,8 +82,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'prueba',
-       
+        'NAME': 'prueba4',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',   # O la IP del servidor de base de datos si es diferente
