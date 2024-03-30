@@ -122,7 +122,7 @@ def recibir_tokenWhats(request):
                     timestamp_mensaje = message.get('timestamp')
                     if mensaje and telefono and timestamp_mensaje:
                         timestamp_mensaje = datetime.fromtimestamp(int(timestamp_mensaje))
-                        if timestamp_mensaje >= timestamp_solicitud:
+                        if timestamp_mensaje <= timestamp_solicitud:
                             print('Procesando mensaje:', mensaje)
                             print('Procesando teléfono:', telefono)
                             return verificar_token(mensaje, telefono)

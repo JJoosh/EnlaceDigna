@@ -40,12 +40,17 @@ def verificar_token(token, num):
 
 
 
+from urllib.parse import quote
+import boto3
+from django.conf import settings
+
 def subir_archivo_a_s3(archivo, nombre_archivo, token):
-    # Reemplazar espacios en blanco en el nombre del archivo para evitar problemas con la URL
-    nombre_archivo = nombre_archivo.replace(' ', '+')
+    # Asegurar que el nombre del archivo se codifique correctamente una sola vez
+    # Codificar el nombre del archivo para evitar problemas con la URL
+    nombre_archivo_codificado = quote(nombre_archivo)
 
     # La ruta del archivo en S3 ahora solo incluirá el token como nombre de carpeta
-    ruta_s3 = f"ultrasonidos/{token}/{nombre_archivo}" 
+    ruta_s3 = f"ultrasonidos/{token}/{nombre_archivo_codificado}"
 
     s3 = boto3.client(
         's3',
@@ -63,10 +68,9 @@ def subir_archivo_a_s3(archivo, nombre_archivo, token):
         }
     )
 
-    # La URL que se retorna incluirá la ruta completa con el token como carpeta
+    # La URL que se retorna debe codificarse correctamente
     url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{ruta_s3}"
     return url
-
 
 
 

@@ -8,7 +8,7 @@ def getURL():
 
 
 def getToken():
-    access_token = "EABPlBU5h77QBO1XWUJ0wZBAaw0BcqzvATYEdffITjww8ZAAR5rC78m5ENGlczm4QPRuRLZAfk3hYcc4jKp2Kiqg8c7Wk6P8gU4LjaIaQvCRRPvW22wLCXZAfiuJGnxz3RpZBwSiR7oKCn4bGIx9Tqz0s52DZAWuR4TgCHM9xZBnhVWAklayx34kTY2AsbPyBFpbBWRcXfDO7QL0RWR3iyQZD"
+    access_token = "EABPlBU5h77QBO0yIA7Bxcnetrj2rTW8gwy5jSDRmdDX7x3883VBWkVawSpSLbHZBbRBUur96nXi92w6TmA5lwZA7LiOkMRE7qhdY6XZAMmjn9d3Amnv4oMS7K7g9EAZBSqCU4GCzmt2eSmcAfqa0Hp9MJEgndsEKIEdoSVQhNtezL7zLipq8OCnTrxNNSoFBgfMPJK6qtk0TAMsC9GEZD"
     return access_token
 
 
@@ -18,7 +18,7 @@ def enviarMessage_errorToken(telefono):
     data = {
         "messaging_product": "whatsapp",    
         "recipient_type": "individual",
-        "to": telefono,
+        "to": "+52" + telefono,
         "type": "text",
         "text": {
             "preview_url": False,
