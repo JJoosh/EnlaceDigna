@@ -4,7 +4,7 @@
             <div class="col text-left">
                 <h2>Listado de pacientes</h2>
                 <div class="col-md-12">
-                    <b-table striped hover :items="pacientes" :fields="fields">
+                    <b-table striped hover :items="usuarios" :fields="fields">
                     </b-table>
                 </div>
             </div>
@@ -32,20 +32,21 @@ export default {
         return {
             fields: [
                 { key: 'Nombre', label: 'Nombre' },
-                { key: 'apellido_p', label: 'Apellido Paterno' },
-                { key: 'apellido_m', label: 'Apellido Materno' },
-                { key: 'telefono', label: 'Teléfono' },
-                { key: 'email', label: 'Email' },
+                { key: 'Apellido_Paterno', label: 'Apellido Paterno' },
+                { key: 'Apellido_Materno', label: 'Apellido Materno' },
+                { key: 'NumeroCelular', label: 'Teléfono' },
+                { key: 'Correo', label: 'correo' },
+                { key: 'Rol', label: 'Rol' },
             ],
-            pacientes: []
+            usuarios: []
         }
     },
     methods: {
-        getpacientes() {
-            const path = 'http://127.0.0.1:8000/api/v1.0/pacientes/'
+        getusuaios() {
+            const path = 'http://127.0.0.1:8000/EnlaceDigna/clientes/'
             axios.get(path)
                 .then((response) => {
-                    this.pacientes = response.data
+                    this.usuarios = response.data
                 })
                 .catch((error) => {
                     console.log(error)
@@ -53,7 +54,7 @@ export default {
         }
     },
     created() {
-        this.getpacientes()
+        this.getusuaios()
     }
 }
 </script>
