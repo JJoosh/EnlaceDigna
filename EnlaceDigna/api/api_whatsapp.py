@@ -18,7 +18,7 @@ def enviarMessage_errorToken(telefono):
     data = {
         "messaging_product": "whatsapp",    
         "recipient_type": "individual",
-        "to": telefono,
+        "to": "+52" + telefono,
         "type": "text",
         "text": {
             "preview_url": False,

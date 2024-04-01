@@ -17,7 +17,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
-    'e8f1-2806-10b7-2-d30b-e19e-fdfc-4b2b-6e5a.ngrok-free.app',
+    '6381-189-203-103-194.ngrok-free.app',
     '127.0.0.1',
 ]
 
@@ -84,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'prueba',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': '1234',
         'HOST': 'localhost',   # O la IP del servidor de base de datos si es diferente
         'PORT': '3306',        # El puerto predeterminado para MySQL es el 3306
     }
@@ -144,3 +144,5 @@ AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN')
 
 
 APPEND_SLASH=False
+
+## AUTH_USER_MODEL = 'EnlaceDigna.Usuarios'

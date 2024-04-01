@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .forms import RegisterForm
 from .models import Usuarios, Cliente  # Importa correctamente tu modelo Usuario
 from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 
 @csrf_protect
@@ -49,3 +51,33 @@ def dashboard(request):
 def galeria(request):
     return render(request, 'galeria.html')
 
+
+
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')  # Asegurándonos de capturar la contraseña también
+
+        # Primero, intentamos autenticar al usuario por email y contraseña
+        user = authenticate(request, username=email, password=password)
+        
+        if user is not None:
+            # Aquí, asumimos que `EnlaceDigan_usuario` está relacionado de alguna manera con el usuario
+            # Vamos a buscar la instancia de EnlaceDigan_usuario que coincida con este usuario
+            try:
+                user_link = EnlaceDigan_usuario.objects.get(user=user)
+                if user_link.Rol == 'Doctor':
+                    login(request, user)
+                    return redirect('dashboard')
+                else:
+                    messages.error(request, 'Acceso denegado. Solo los doctores pueden ingresar.')
+            except EnlaceDigan_usuario.DoesNotExist:
+                messages.error(request, 'No se encontró el enlace de usuario correspondiente.')
+        else:
+            messages.error(request, 'Correo electrónico o contraseña inválidos.')
+    else:
+        # Manejo del caso para métodos que no son POST
+        pass
+
+    return render(request, 'login1.html', {})
