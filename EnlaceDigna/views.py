@@ -45,3 +45,7 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', context)
 
+@csrf_protect
+def galeria(request):
+    return render(request, 'galeria.html')
+

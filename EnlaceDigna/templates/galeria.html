@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos para la galería */
+        .main-container {
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        .box-tipo {
+            margin-bottom: 20px;
+        }
+        .box-tipo h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .grid-item img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="galeria"></div>
+    </div>
+
+    <script>
+        // Función para crear la galería
+        function crearGaleria(datos) {
+            var galeriaContainer = document.querySelector('.galeria');
+            galeriaContainer.innerHTML = '';
+
+            // Agrupar los datos por tipo de ultrasonido
+            var datosAgrupados = {};
+            datos.forEach(function(ultrasonido) {
+                if (!datosAgrupados[ultrasonido.TipoDeUltrasonidos]) {
+                    datosAgrupados[ultrasonido.TipoDeUltrasonidos] = [];
+                }
+                datosAgrupados[ultrasonido.TipoDeUltrasonidos].push(ultrasonido);
+            });
+
+            // Crear las secciones por tipo de ultrasonido y agregar las imágenes
+            Object.keys(datosAgrupados).forEach(function(tipoUltrasonido) {
+                var boxTipo = document.createElement('div');
+                boxTipo.classList.add('box-tipo');
+                boxTipo.innerHTML = '<h2>' + tipoUltrasonido + '</h2>';
+
+                var gridContainer = document.createElement('div');
+                gridContainer.classList.add('grid-container');
+
+                datosAgrupados[tipoUltrasonido].forEach(function(ultrasonido) {
+                    var ruta_files = JSON.parse(ultrasonido.ruta_files); // Parsear la cadena JSON
+                    ruta_files.forEach(function(ruta) {
+                        var gridItem = document.createElement('div');
+                        gridItem.classList.add('grid-item');
+                        var img = document.createElement('img');
+                        img.src = ruta;
+                        gridItem.appendChild(img);
+                        gridContainer.appendChild(gridItem);
+                    });
+                });
+
+                boxTipo.appendChild(gridContainer);
+                galeriaContainer.appendChild(boxTipo);
+            });
+        }
+
+        // Realizar una solicitud AJAX para obtener los datos de la API REST
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var datosUltrasonidos = JSON.parse(xhr.responseText);
+                    crearGaleria(datosUltrasonidos);
+                } else {
+                    console.error('Error al obtener los datos:', xhr.status);
+                }
+            }
+        };
+        xhr.open('GET', '/EnlaceDigna/get_galeria/arto7024/', true);
+        xhr.send();
+    </script>
+</body>
+</html>

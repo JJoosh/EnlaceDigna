@@ -130,3 +130,18 @@ def recibir_tokenWhats(request):
                             print('Mensaje recibido antes de la solicitud POST. Ignorando.')
  
         return Response({"status": "success"})
+
+
+@api_view(['GET'])
+def get_galeria(request, token):
+    try:
+        cliente = Cliente.objects.get(Token=token)
+        datos_ultrasonido = Ultrasonidos.objects.filter(cliente=cliente)
+        
+        data = [{'ruta_files': ultrasonido.ruta_files, 'TipoDeUltrasonidos': ultrasonido.TipoDeUltrasonidos, 'Fecha': ultrasonido.Fecha} for ultrasonido in datos_ultrasonido]
+        return Response(data)
+    
+    except Cliente.DoesNotExist:
+        return Response({'error': 'El token proporcionado no corresponde a ningún cliente'}, status=404)
+    except Ultrasonidos.DoesNotExist:
+        return Response({'error': 'No se encontraron ultrasonidos para este cliente'}, status=404)
