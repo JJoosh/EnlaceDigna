@@ -11,10 +11,20 @@
         </div>
     </div>
 </template>
+<style lang="css">
+/* Importa los estilos de Bootstrap solo en este componente */
+@import 'bootstrap/dist/css/bootstrap.css';
+@import 'bootstrap-vue/dist/bootstrap-vue.css';
+
+h2{
+    margin-top: 10px;
+}
+/* Estilos específicos de este componente */
+/* Agrega tus estilos aquí */
+</style>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 import axios from 'axios'
 
 export default {

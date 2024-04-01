@@ -12,6 +12,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bootstrap-vue": "^2.23.1",
+    "imagesloaded": "^5.0.0",
+    "masonry-layout": "^4.2.2",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },

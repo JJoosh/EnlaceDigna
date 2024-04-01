@@ -3,9 +3,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
-        <!-- Agrega esta línea en la sección <head> de tu HTML -->
-  
-  
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <body>
     
@@ -103,21 +100,17 @@
                             <label for="files" class="custom-upload-button">
                               <img class="add" src="@/assets/agregar.png" alt="Subir archivos">
                             </label>
-                            <input type="file" name="files[]" id="files" multiple accept="image/*, video/*" style="display: none;">
-                           
+                                <input type="file" name="files[]" id="files" multiple accept="image/*, video/*" style="display: none;">
                                 <div class="right" v-if="selectedOrder">
                                         <h2>Nombre: {{ selectedOrder.nombre }}</h2>
                                         <h2>Token: {{ selectedOrder.token }}</h2>
                                         <h2>Fecha: {{ selectedOrder.fecha }}</h2>
                                 </div>
                                 <div class="right" v-else>
-                                    
                                         <h2>Nombre: </h2>
                                         <h2>Token: </h2>
                                         <p>Fecha: </p>
-                                    
                                 </div>
-                        
                             <div class="both-ultra">
                                 <label for="ultrasonido" class="ultra"><h2>Tipo de ultrasonido</h2></label>
                             <input type="text" name="ultrasonido" id="ultrasonido" placeholder="Escribe aqui">
@@ -163,7 +156,7 @@
                 </div>
                 <div class="user-profile">
                     <div class="logo">
-                        <img src="/src/assets/SALUD.svg" alt="Imagen SVG de Salud">
+                        <img src="@/assets/SALUD.svg" alt="Imagen SVG de Salud">
                         <h2>Salud Digna</h2>
                         <p>Datos</p>
                     </div>
@@ -179,7 +172,7 @@
                 </div>
                 <div class="user-profile">
                     <div class="logo">
-                        <img src="/src/assets/SALUD.svg" alt="Imagen SVG de Salud">
+                        <img src="@/assets/SALUD.svg" alt="Imagen SVG de Salud">
                         <p>Datos</p>
                     </div>
                 </div>
