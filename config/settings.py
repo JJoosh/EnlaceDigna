@@ -17,7 +17,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
-    '7da1-2806-2f0-93a0-e79b-ffe9-c6c-b09-90ad.ngrok-free.app',
+    '6381-189-203-103-194.ngrok-free.app',
     '127.0.0.1',
 ]
 
@@ -144,3 +144,5 @@ AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN')
 
 
 APPEND_SLASH=False
+
+## AUTH_USER_MODEL = 'EnlaceDigna.Usuarios'

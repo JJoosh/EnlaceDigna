@@ -8,4 +8,5 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('enviar_whats/<str:cliente_id>/', enviar_verificacion, name='enviar_mensaje'),
     path('recibir_token/', recibir_tokenWhats, name='recibir token'),
+    path('login/', views.login_view, name='login'),
 ]
