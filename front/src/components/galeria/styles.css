@@ -22,11 +22,13 @@ z-index: 1000000;
 }
 .logo{
 height: 70px;
+background-color: transparent;
 }
 .menu{
 display: flex;
 align-items: center;
 justify-content: center;
+background-color: transparent;
 }
 .item{
 margin: 0 15px;
@@ -34,6 +36,7 @@ font-size: 18px;
 font-weight: 600;
 cursor: pointer;
 color: #000;
+background-color: transparent;
 }
 .item:hover{
 color: #33a451;

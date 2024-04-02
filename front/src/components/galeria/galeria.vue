@@ -1,15 +1,15 @@
 <template lang="html">
   <body>
     <header id="header">
-        <img src="@/assets/recurso1.jpg" class="logo">
+        <img src="@/assets/Recurso1.svg" class="logo">
       <input type="checkbox" id="menu">
       <label for="menu">
         <i class="fa-solid fa-bars menu_icono"></i>
       </label>
       <ul class="menu">
-        <li class="item">Ajustes</li>
-        <li class="item">Usuario</li>
-        <li class="btn">Salir</li>
+        <li class="item" id="item">Ajustes</li>
+        <li class="item" id="item">Usuario</li>
+        <li class="btn"  id="item">Salir</li>
       </ul>
     </header>
     <main>
@@ -123,10 +123,12 @@ data() {
 },
 mounted() {
   const header = document.getElementById("header");
+  const item = document.getElementById("item");
   window.addEventListener('scroll', () => {
     var scroll = window.scrollY;
     if (scroll > 10) {
       header.style.backgroundColor = '#000';
+      item.style.color = '#fff';
     } else {
       header.style.backgroundColor = 'transparent';
     }
