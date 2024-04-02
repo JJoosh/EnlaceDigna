@@ -21,8 +21,12 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -146,3 +150,19 @@ AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN')
 APPEND_SLASH=False
 
 ## AUTH_USER_MODEL = 'EnlaceDigna.Usuarios'
+AUTHENTICATION_BACKENDS = [
+    'EnlaceDigna.views.MyCustomBackend',
+    # Puedes listar otros backends aquí
+]
+
+LOGIN_REDIRECT_URL = 'dashboard' 
+LOGIN_URL = 'login'
+
+
+# En settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'joshuaaviles58@gmail.com'
+EMAIL_HOST_PASSWORD = 'cofe sqfj uuno cnxs'

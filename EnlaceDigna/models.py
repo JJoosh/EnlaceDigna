@@ -10,6 +10,11 @@ class Usuarios(models.Model):
     NumeroCelular = models.CharField(max_length=20, blank=True, null=True)
     Rol = models.CharField(max_length=50, null=False)
 
+     # Agregar el campo last_login
+    is_authenticated = models.BooleanField(default=False)
+    last_login = models.DateTimeField(blank=True, null=True)
+
+
     def __str__(self):
         return f'{self.Nombre} {self.Apellido_Paterno}'
 
@@ -44,7 +49,7 @@ class Doctor(models.Model):
 
 class Ultrasonidos(models.Model):
     ruta_files = models.TextField()
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
     TipoDeUltrasonidos = models.CharField(max_length=255, null=False)
     Fecha = models.DateField(auto_now_add=True)
     

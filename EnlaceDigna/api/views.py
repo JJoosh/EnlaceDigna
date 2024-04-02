@@ -1,84 +1,93 @@
-from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework import status
-from .serializer import UltrasonidoSerializer  # Asegúrate de que el nombre del serializer coincida
-from .archivo import subir_archivo_a_s3  # Ajusta el import según tu estructura de proyecto
-from rest_framework.decorators import api_view
-from ..models import Usuarios
-from .api_whatsapp import message_pedirToken
-import requests
-import json
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from .archivo import verificar_token
 from django.forms import ValidationError
+from django.utils import timezone
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-from django.utils import timezone
-from ..models import Ultrasonidos, Cliente  # Asumiendo que Cliente está en el mismo lugar que Ultrasonido
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view  # Esta es la línea que falta
+from django.http import HttpResponse
+from pydicom import dcmread
+from pydicom.errors import InvalidDicomError
+from io import BytesIO
+import numpy as np
+from ..models import Cliente, Ultrasonidos, Usuarios  # Asegúrate de importar Usuarios
+
 from .serializer import UltrasonidoSerializer
-from .archivo import subir_archivo_a_s3
+from .archivo import subir_archivo_a_s3, verificar_token  # Asegúrate de que verificar_token esté definido
 import json
-import re
-import logging
+from datetime import datetime
+from PIL import Image
+import io
+import magic
+
+from io import BytesIO
+import magic
+from PIL import Image
+from pydicom import dcmread
+from pydicom.pixel_data_handlers.util import apply_voi_lut
 
 
 
-from datetime import datetime, timedelta
 
-import hashlib
 
 class UltrasonidoUploadAPIView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    # Asume que las permisiones y parsers necesarios están definidos aquí.
 
     def post(self, request, *args, **kwargs):
         archivos = request.FILES.getlist('archivo')
         if not archivos:
             return Response({"mensaje": "No se encontraron archivos para subir."}, status=status.HTTP_400_BAD_REQUEST)
 
-        tipo_ultrasonido = request.data.get('ultrasonido')
-        id_cliente = request.data.get('cliente_id')
-        fecha_actual = timezone.now().date()
-
-        if not tipo_ultrasonido:
-            return Response({"mensaje": "El tipo de ultrasonido es requerido."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not re.match(r'^[A-Za-z\s]+$', tipo_ultrasonido):
-            return Response({"mensaje": "El tipo de ultrasonido contiene caracteres inválidos."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            cliente = Cliente.objects.get(id=id_cliente)
-            token_cliente = cliente.Token
-        except Cliente.DoesNotExist:
-            return Response({"mensaje": "Cliente no encontrado."}, status=status.HTTP_404_NOT_FOUND)
-        except Cliente.MultipleObjectsReturned:
-            return Response({"mensaje": "Múltiples clientes encontrados con el mismo ID."}, status=status.HTTP_400_BAD_REQUEST)
-
         rutas_files = []
-        print(archivos)
         for archivo in archivos:
-            logging.debug(f"Procesando archivo: {archivo.name}")
-            nombre_archivo_sanitizado = archivo.name.replace(" ", "+")
-            nombre_archivo = f'{nombre_archivo_sanitizado}'  # Directamente el token del cliente como carpeta principal
-            url = subir_archivo_a_s3(archivo, nombre_archivo, token_cliente)  # Asegúrate de que esta función acepte el token como argumento
-            rutas_files.append(url)
+            extension = archivo.name.rsplit('.', 1)[-1].lower()
+            if extension in ['jpeg', 'jpg', 'mp4', 'avi']:
+                buffer = BytesIO(archivo.read())
+                archivo_nombre = f"{archivo.name}"
+                url = subir_archivo_a_s3(buffer, archivo_nombre, 'token_cliente')  # Asume manejo de tokens
+                rutas_files.append(url)
+            elif extension in ['dcm']:
+                try:
+                    dicom_data = dcmread(archivo)
+                    if 'PixelData' in dicom_data:
+                        # Procesamiento específico para archivos DICOM
+                        image_data = self.procesar_dicom(dicom_data)
 
-        rutas_files_json = json.dumps(rutas_files)
+                        # Convertir a imagen JPEG y guardar en buffer
+                        pil_img = Image.fromarray(image_data)
+                        buffer = BytesIO()
+                        pil_img.save(buffer, format="JPEG")
+                        buffer.seek(0)  # Rebobinar el buffer
 
-        try:
-            ultrasonido_obj = Ultrasonidos.objects.create(
-                ruta_files=rutas_files_json,
-                cliente_id=id_cliente,
-                TipoDeUltrasonidos=tipo_ultrasonido,
-                Fecha=fecha_actual
-            )
-        except ValidationError as e:
-            return Response({"mensaje": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                        # Construir nombre de archivo y subir a S3
+                        archivo_nombre_jpeg = f"{archivo.name.rsplit('.', 1)[0]}.jpeg"
+                        url = subir_archivo_a_s3(buffer, archivo_nombre_jpeg, 'token_cliente')  # Asume manejo de tokens
+                        rutas_files.append(url)
+                    else:
+                        return Response({"mensaje": f"El archivo {archivo.name} no contiene datos de imagen."}, status=status.HTTP_400_BAD_REQUEST)
+                except InvalidDicomError:
+                    return Response({"mensaje": f"El archivo {archivo.name} no es un archivo DICOM válido."}, status=status.HTTP_400_BAD_REQUEST)
+                except Exception as e:
+                    return Response({"mensaje": f"Error procesando el archivo {archivo.name}: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"mensaje": f"Tipo de archivo no soportado para {archivo.name}."}, status=status.HTTP_400_BAD_REQUEST)
 
+        ultrasonido_obj = Ultrasonidos.objects.create(ruta_files=json.dumps(rutas_files))
         serializer = UltrasonidoSerializer(ultrasonido_obj)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def procesar_dicom(self, dicom_data):
+        # Aplicar transformaciones necesarias a la imagen DICOM
+        image_data = apply_voi_lut(dicom_data.pixel_array, dicom_data)
+        if dicom_data.PhotometricInterpretation == "MONOCHROME1":
+            image_data = np.amax(image_data) - image_data
+        image_data = (np.clip(image_data, 0, None) / image_data.max()) * 255.0
+        image_data = np.uint8(image_data)
+        return image_data
 
 
 
@@ -130,3 +139,14 @@ def recibir_tokenWhats(request):
                             print('Mensaje recibido antes de la solicitud POST. Ignorando.')
  
         return Response({"status": "success"})
+
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     def validate(self, attrs):
+#         data = super().validate(attrs)
+#         user = self.user  # El usuario ya está disponible aquí
+#         if user.rol != 'Doctor':
+#             raise serializers.ValidationError('Solo los doctores pueden acceder.')
+#         return data
+
+# class MyTokenObtainPairView(TokenObtainPairView):
+#     serializer_class = MyTokenObtainPairSerializer

@@ -1,6 +1,7 @@
 # archivo.py
 
 import os
+from urllib.parse import quote_plus
 import boto3
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -13,6 +14,7 @@ from .api_whatsapp import enviar_mensaje
 from django.core.exceptions import ObjectDoesNotExist
 from .api_whatsapp import enviarMessage_errorToken
 from ..models import Usuarios, Ultrasonidos
+import magic
 
 def verificar_token(token, num):
     data_cliente = Cliente.objects.filter(Token=token).first()
@@ -44,13 +46,12 @@ from urllib.parse import quote
 import boto3
 from django.conf import settings
 
-def subir_archivo_a_s3(archivo, nombre_archivo, token):
-    # Asegurar que el nombre del archivo se codifique correctamente una sola vez
-    # Codificar el nombre del archivo para evitar problemas con la URL
-    nombre_archivo_codificado = quote(nombre_archivo)
 
-    # La ruta del archivo en S3 ahora solo incluirá el token como nombre de carpeta
-    ruta_s3 = f"ultrasonidos/{token}/{nombre_archivo_codificado}"
+def subir_archivo_a_s3(buffer, nombre_archivo, token):
+    # Codifica solo los caracteres necesarios con quote_plus, lo que resultará en %20 para los espacios
+    nombre_archivo_codificado = quote_plus(nombre_archivo)
+
+    ruta_s3 = f"ultrasonidos/{nombre_archivo_codificado}"
 
     s3 = boto3.client(
         's3',
@@ -58,17 +59,22 @@ def subir_archivo_a_s3(archivo, nombre_archivo, token):
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
 
+    # Determina el tipo de contenido del archivo
+    file_type = magic.from_buffer(buffer.read(2048), mime=True)
+    buffer.seek(0)  # Rebobinar el buffer
+
+    # Sube el archivo con el nombre original y el tipo de contenido
     s3.upload_fileobj(
-        archivo,
+        buffer,
         settings.AWS_STORAGE_BUCKET_NAME,
         ruta_s3,
         ExtraArgs={
             "ACL": "public-read",
-            "ContentType": archivo.content_type
+            "ContentType": file_type
         }
     )
 
-    # La URL que se retorna debe codificarse correctamente
+    # Genera la URL sin recodificar el nombre del archivo
     url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{ruta_s3}"
     return url
 
