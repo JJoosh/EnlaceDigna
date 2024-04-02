@@ -47,11 +47,10 @@ import boto3
 from django.conf import settings
 
 
-def subir_archivo_a_s3(buffer, nombre_archivo, token):
-    # Codifica solo los caracteres necesarios con quote_plus, lo que resultará en %20 para los espacios
+def subir_archivo_a_s3(buffer, nombre_archivo, fecha, idcliente):
     nombre_archivo_codificado = quote_plus(nombre_archivo)
 
-    ruta_s3 = f"ultrasonidos/{nombre_archivo_codificado}"
+    ruta_carpeta_cliente = f"ultrasonidos/{idcliente}/{fecha}/"
 
     s3 = boto3.client(
         's3',
@@ -59,11 +58,18 @@ def subir_archivo_a_s3(buffer, nombre_archivo, token):
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
 
-    # Determina el tipo de contenido del archivo
-    file_type = magic.from_buffer(buffer.read(2048), mime=True)
-    buffer.seek(0)  # Rebobinar el buffer
+    # Verifica si la carpeta ya existe
+    try:
+        s3.head_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=ruta_carpeta_cliente)
+    except:
+        # Si la carpeta no existe, la crea
+        s3.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=ruta_carpeta_cliente)
 
-    # Sube el archivo con el nombre original y el tipo de contenido
+    ruta_s3 = ruta_carpeta_cliente + nombre_archivo_codificado
+
+    file_type = magic.from_buffer(buffer.read(2048), mime=True)
+    buffer.seek(0)  
+
     s3.upload_fileobj(
         buffer,
         settings.AWS_STORAGE_BUCKET_NAME,
@@ -77,8 +83,6 @@ def subir_archivo_a_s3(buffer, nombre_archivo, token):
     # Genera la URL sin recodificar el nombre del archivo
     url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{ruta_s3}"
     return url
-
-
 
 def buscar_urls(id):
     data_ultrasonidos = Ultrasonidos.objects.filter(cliente=id).last()

@@ -71,8 +71,7 @@ class UltrasonidoUploadAPIView(APIView):
 
                         # Construir nombre de archivo y subir a S3
                         archivo_nombre_jpeg = f"{archivo.name.rsplit('.', 1)[0]}.jpeg"
-                        url = subir_archivo_a_s3(buffer, archivo_nombre_jpeg, 'token_cliente')  # Asume manejo de tokens
-                        rutas_files.append(url)
+                        
 
                         # Obtener datos DICOM
                         if contador == 0:
@@ -82,6 +81,8 @@ class UltrasonidoUploadAPIView(APIView):
                             print("ID del paciente:", idPaciente)
                             print("Tipo de ultrasonido: ", descripcionUltras)
                         contador += 1
+                        url = subir_archivo_a_s3(buffer, archivo_nombre_jpeg, fechaUltrasonido, idPaciente)  # Asume manejo de tokens
+                        rutas_files.append(url)
                 except pydicom.errors.InvalidDicomError:
                     return Response({"mensaje": f"El archivo {archivo.name} no es un archivo DICOM válido."}, status=status.HTTP_400_BAD_REQUEST)
                 except Exception as e:
