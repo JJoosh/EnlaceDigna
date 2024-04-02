@@ -140,6 +140,7 @@ def recibir_tokenWhats(request):
  
         return Response({"status": "success"})
 
+<<<<<<< HEAD
 # class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #     def validate(self, attrs):
 #         data = super().validate(attrs)
@@ -150,3 +151,19 @@ def recibir_tokenWhats(request):
 
 # class MyTokenObtainPairView(TokenObtainPairView):
 #     serializer_class = MyTokenObtainPairSerializer
+=======
+
+@api_view(['GET'])
+def get_galeria(request, token):
+    try:
+        cliente = Cliente.objects.get(Token=token)
+        datos_ultrasonido = Ultrasonidos.objects.filter(cliente=cliente)
+        
+        data = [{'ruta_files': ultrasonido.ruta_files, 'TipoDeUltrasonidos': ultrasonido.TipoDeUltrasonidos, 'Fecha': ultrasonido.Fecha} for ultrasonido in datos_ultrasonido]
+        return Response(data)
+    
+    except Cliente.DoesNotExist:
+        return Response({'error': 'El token proporcionado no corresponde a ningún cliente'}, status=404)
+    except Ultrasonidos.DoesNotExist:
+        return Response({'error': 'No se encontraron ultrasonidos para este cliente'}, status=404)
+>>>>>>> 4aec583b7a77517d3bf1890cd22d4580abbacbf1

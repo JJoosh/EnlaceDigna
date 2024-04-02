@@ -40,6 +40,35 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, 'index.html', {'form': form})
+<<<<<<< HEAD
+=======
+
+@csrf_protect
+def dashboard(request):
+    query = request.GET.get('search', '')  # Obtiene el parámetro de búsqueda 'search' de la URL, si existe
+    clientes_encontrados = Cliente.objects.select_related('usuario')
+    clientes = clientes_encontrados.filter(Token__icontains=query) if query else None
+
+    # Indicador de si se ha realizado una búsqueda.
+    search_performed = bool(query and clientes)
+
+    context = {
+        'clientes': clientes if search_performed else None,  # Solo pasamos los clientes si se realizó una búsqueda
+        'query': query,
+        'search_performed': search_performed,  # Indicador de búsqueda realizada
+        'todos_los_clientes': clientes_encontrados if not search_performed else None,  # Lista de todos los clientes si no se realizó búsqueda
+    }
+
+    return render(request, 'dashboard.html', context)
+
+@csrf_protect
+def galeria(request):
+    return render(request, 'galeria.html')
+
+
+
+
+>>>>>>> 4aec583b7a77517d3bf1890cd22d4580abbacbf1
 def login_view(request):
     if request.method == 'GET':
         return render(request, 'login1.html')
