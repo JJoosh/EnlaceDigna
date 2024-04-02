@@ -1,5 +1,21 @@
 <template lang="html">
     <body>
+      <header id="main-header">
+	
+	<a id="logo-header" href="#">
+		<span class="site-name">FranciscoAMK</span>
+		<span class="site-desc">Diseño web / WordPress / Tutoriales</span>
+	</a> <!-- / #logo-header -->
+
+	<nav>
+		<ul>
+			<li><a href="#">Inicio</a></li>
+			<li><a href="#">Acerca de</a></li>
+			<li><a href="#">Contacto</a></li>
+		</ul>
+	</nav><!-- / nav -->
+
+</header><!-- / #main-header -->
       <main>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -21,18 +37,118 @@
           <h2>Ultrasonido: Nombre</h2>
           <p>Fecha: 1/04/2023</p>
         </div>
-                    <div class="container" >
-                      hola
-                      <div href="grid" class="grid-container">
+        <div class="container" >
+          <div href="grid" class="grid-container">
+                            <img class="grid-item" src="https://picsum.photos/230/155.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/152.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/154.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/150.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/158.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/150.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/152.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/154.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/150.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/158.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/155.jpg" width="230" height="155"/>
+                            
+      <!-- <img class="grid-item" src="https://picsum.photos/230/300.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/410.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/250.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/180.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/340.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/120.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/215.jpg"  /> -->
+      <!-- <img class="grid-item" src="https://picsum.photos/230/420.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/320.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/153.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/480.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/260.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/450.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/135.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/180.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/340.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/120.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/215.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/420.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/320.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/153.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/480.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/260.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/450.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/135.jpg"  /> -->
                       </div>
                     </div>
-                    
+
+                    <div class="box-date">
+          <h2>Ultrasonido: Nombre</h2>
+          <p>Fecha: 1/04/2023</p>
         </div>
+        <div class="container" >
+          <div href="grid" class="grid-container">
+                            <img class="grid-item" src="https://picsum.photos/230/155.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/152.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/154.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/150.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/158.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/150.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/152.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/154.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/150.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/158.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/153.jpg" width="230" height="155"/>
+                            <img class="grid-item" src="https://picsum.photos/230/155.jpg" width="230" height="155"/>
+                            
+      <!-- <img class="grid-item" src="https://picsum.photos/230/300.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/410.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/250.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/180.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/340.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/120.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/215.jpg"  /> -->
+      <!-- <img class="grid-item" src="https://picsum.photos/230/420.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/320.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/153.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/480.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/260.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/450.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/135.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/180.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/340.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/120.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/215.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/420.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/320.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/153.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/480.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/260.jpg" />
+      <img class="grid-item" src="https://picsum.photos/230/450.jpg"  />
+      <img class="grid-item" src="https://picsum.photos/230/135.jpg"  /> -->
+                      </div>
+                    </div>
+        </div>
+        
       </div>
       </main>
 </body>
 </template>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;800&display=swap');
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+}
+
 main .recent-orders .container:hover{
   box-shadow: none;
   background-color: #fff;
@@ -72,6 +188,80 @@ main .recent-orders .container:hover{
         user-select: none;
         overflow-x: hidden;
     }
+
+
+    #main-header {
+	background: #333;
+	color: white;
+	height: 80px;
+	
+	width: 100%;
+	left: 0;
+	top: 0;
+	position: fixed;
+}	
+	#main-header a {
+		color: white;
+	}
+	
+	
+/*
+ * Logo
+ */
+#logo-header {
+	float: left;
+	padding: 15px 0 0 20px;
+	text-decoration: none;
+}
+	#logo-header:hover {
+		color: #0b76a6;
+	}
+	
+	#logo-header .site-name {
+		display: block;
+		font-weight: 700;
+		font-size: 1.2em;
+	}
+	
+	#logo-header .site-desc {
+		display: block;
+		font-weight: 300;
+		font-size: 0.8em;
+		color: #999;
+	}
+	
+
+/*
+ * Navegación
+ */
+nav {
+	float: right;
+}
+	nav ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		padding-right: 20px;
+	}
+	
+		nav ul li {
+			display: inline-block;
+			line-height: 80px;
+		}
+			
+			nav ul li a {
+				display: block;
+				padding: 0 10px;
+				text-decoration: none;
+			}
+			
+				nav ul li a:hover {
+					background: #0b76a6;
+				}
+	
+
+
+
     .box-date{
         margin: 20px 5%;
       display: flex;
@@ -89,13 +279,15 @@ main .recent-orders .container:hover{
   
 }
 .grid-item {
-  width: 230px;
+   
+  /* width: 230px;  */
   margin-bottom: 40px;
   border-radius: 15px;
   cursor: zoom-in;
   background-color: lightgray;
-}
+  z-index: 4;
 
+}
 .grid-item:hover {
   filter: opacity(0.9);
   transform:scale(1.1);
@@ -192,7 +384,7 @@ export default {
   mounted() {
     // Elemento que quieres convertir en un diseño de mampostería
     var elem = document.querySelector('.grid-container');
-    imagesLoaded(elem,()=>{
+    // imagesLoaded(elem,()=>{
       var msnry = new Masonry( elem, {
   // option
         itemSelector: '.grid-item',
@@ -200,7 +392,7 @@ export default {
         gutter: 20,
         isFitWidth: true
 });
-    });
+    // });
   }
 };
 </script>

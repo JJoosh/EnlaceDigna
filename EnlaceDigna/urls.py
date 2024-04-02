@@ -20,6 +20,5 @@ urlpatterns = [
     path('galeria/', views.galeria, name='Galeria Usuario' ),
     path('login/', views.login_view, name='login'),
     path('login/', views.login_view, name='login'),
-    
 ]
 urlpatterns += router.urls
