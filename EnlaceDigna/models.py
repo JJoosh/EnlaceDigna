@@ -31,8 +31,7 @@ class Usuarios(models.Model):
 
 class Cliente(models.Model):
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-    def __str__(self):
-        return self.Token
+    
 
 class Doctor(models.Model):
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)

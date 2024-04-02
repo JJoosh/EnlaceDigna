@@ -1,3 +1,5 @@
+import secrets
+import string
 from django.forms import ValidationError
 from django.utils import timezone
 from django.core.files.storage import default_storage
@@ -92,11 +94,10 @@ class UltrasonidoUploadAPIView(APIView):
 
         fechaUltrasonido = timezone.now().strftime("%Y-%m-%d")
         
-        # Crea el objeto Ultrasonidos en la base de datos
         ultrasonido_obj = Ultrasonidos.objects.create(ruta_files=json.dumps(rutas_files),
                                                       TipoDeUltrasonidos=descripcionUltras,  # Cambio el nombre del campo
                                                       Fecha=fechaUltrasonido,  # Cambio el nombre del campo
-                                                      tokenUltrasonido='12345',  # Valor por defecto
+                                                      tokenUltrasonido=generar_token_10_caracteres(),  # Valor por defecto
                                                       cliente_id=idPaciente)  # Cambio el nombre del campo
         serializer = UltrasonidoSerializer(ultrasonido_obj)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -127,6 +128,13 @@ class UltrasonidoUploadAPIView(APIView):
         
 
 
+def generar_token_10_caracteres():
+    # Define el alfabeto para el token: letras (mayúsculas y minúsculas) y dígitos
+    alfabeto = string.ascii_letters + string.digits
+    # Genera un token de 10 caracteres aleatorios
+    token = ''.join(secrets.choice(alfabeto) for _ in range(10))
+    return token
+
 def enviar_verificacion(cliente_id, nombrePaciente):
     data_cliente = get_object_or_404(Cliente, id=cliente_id)
     id_usuario = data_cliente.usuario_id
@@ -134,6 +142,7 @@ def enviar_verificacion(cliente_id, nombrePaciente):
 
     data_usuario = get_object_or_404(Usuarios, id=id_usuario)
     num_telefono = data_usuario.NumeroCelular
+    print('Numero= ', num_telefono)
     nombre = data_usuario.Nombre
     codigo_area = '52'
     print(nombre, ' asdasd',  codigo_area + num_telefono)                                                      
@@ -164,25 +173,16 @@ def recibir_tokenWhats(request):
                     timestamp_mensaje = message.get('timestamp')
                     if mensaje and telefono and timestamp_mensaje:
                         timestamp_mensaje = datetime.fromtimestamp(int(timestamp_mensaje))
-                        if timestamp_mensaje <= timestamp_solicitud:
+                       
+                        if timestamp_mensaje > timestamp_solicitud:
                             print('Procesando mensaje:', mensaje)
                             print('Procesando teléfono:', telefono)
                             return verificar_token(mensaje, telefono)
                         else:
-                            print('Mensaje recibido antes de la solicitud POST. Ignorando.')
+                            print('Mensaje recibido despues de la solicitud POST. Ignorando.')
  
         return Response({"status": "success"})
 
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     def validate(self, attrs):
-#         data = super().validate(attrs)
-#         user = self.user  # El usuario ya está disponible aquí
-#         if user.rol != 'Doctor':
-#             raise serializers.ValidationError('Solo los doctores pueden acceder.')
-#         return data
-
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = MyTokenObtainPairSerializer
 
 
 @api_view(['GET'])

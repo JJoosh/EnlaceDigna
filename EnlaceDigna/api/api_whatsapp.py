@@ -18,7 +18,7 @@ def enviarMessage_errorToken(telefono):
     data = {
         "messaging_product": "whatsapp",    
         "recipient_type": "individual",
-        "to": "+52" + telefono,
+        "to":  telefono,
         "type": "text",
         "text": {
             "preview_url": False,
@@ -39,16 +39,48 @@ def enviarMessage_errorToken(telefono):
     return Response({"message": "Mensaje enviado correctamente" if response.status_code == 200 else f"Error al enviar el mensaje: {response.text}"})
 
 
-def enviar_img(telefono, urls):
+def enviar_img(telefono, urls, nombre, fecha):
     for url in urls:
+        print('enviando url: ' ,url)
         data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": telefono,
+        "messaging_product": "whatsapp",
+  "to": telefono,
+  "type": "template",
+  "template": {
+    "name": "envio_resultados",
+    "language": {
+      "code": "es_MX"
+    },
+    "components": [
+      {
+        "type": "header",
+        "parameters": [
+          {
             "type": "image",
             "image": {
-                "link": url
+              "link": url
             }
+          }
+        ]
+      },
+      {
+        "type": "body",
+        "parameters": [
+          {
+            "type": "text",
+            "text": nombre
+          },
+          {
+              "type": "text",
+              "text": fecha
+          }
+        ]
+      },
+      
+    ]
+  }
+        
+
         }
         
         headers = {
@@ -70,14 +102,49 @@ def enviar_videos(telefono, urls):
     for url in urls:
         print('enviar_videos:', url)
         data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": telefono,
-            "type": "video",
-            "video": {
-                "link": url
+        "messaging_product": "whatsapp",
+  "to": "telefono",
+  "type": "template",
+  "template": {
+    "name": "",
+    "language": {
+      "code": "es_MX"
+    },
+    "components": [
+      {
+        "type": "header",
+        "parameters": [
+          {
+            "type": "image",
+            "image": {
+              "link": "https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/token_ticket.jpeg"
             }
-        }
+          }
+        ]
+      },
+      {
+        "type": "body",
+        "parameters": [
+          {
+            "type": "text",
+            "text": "nombre"
+          }
+        ]
+      },
+      {
+        "type": "body",
+        "parameters": [
+          {
+            "type": "text",
+            "text": "fecha"
+          }
+        ]
+      }
+    ]
+  }
+
+    }
+
         headers = {
             "Authorization": f"Bearer {getToken()}",
             "Content-Type": "application/json"
@@ -92,7 +159,7 @@ def enviar_videos(telefono, urls):
     return Response({"message": "Todos los videos fueron enviados correctamente"})
 
 
-def enviar_mensaje(telefono, nombre, apellido, urlsv, urlsi):
+def enviar_mensaje(telefono, nombre, apellido, urlsv, urlsi, tipoultra, fecha):
     print(telefono)
 
     #AQUI ENVIARA EL MENSAJE PRINCIPAL QUE INICIARA EL ENVIO DE RESULTADOS
@@ -103,7 +170,7 @@ def enviar_mensaje(telefono, nombre, apellido, urlsv, urlsi):
         "type": "text",
         "text": {
             "preview_url": False,
-            "body": "Hola " + nombre +" " +apellido+ " estos son los resultados de tu ultrasonido"
+            "body": "Hola " + nombre +" " +apellido+ ", en los siguientes minutos estaran llegando los resultados de ultrasonido"
         }
     }
     headers = {
@@ -113,7 +180,7 @@ def enviar_mensaje(telefono, nombre, apellido, urlsv, urlsi):
     response = requests.post(getURL(), headers=headers, json=data)
     
     enviar_videos(telefono, urlsv )
-    enviar_img(telefono, urlsi)
+    enviar_img(telefono, urlsi, tipoultra, fecha)
     if response.status_code == 200:
         print('bien')
         return Response({"message": "Mensaje enviado correctamente"})
@@ -146,7 +213,7 @@ def message_pedirToken(telefono, nombre):
             
             "type": "image",
             "image": {
-              "link": "https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/Screenshot-8.png"
+              "link": "https://saluddignaultra.s3.us-east-2.amazonaws.com/ultrasonidos/token_ticket.jpeg"
             }
           }
         ]
@@ -176,7 +243,7 @@ def message_pedirToken(telefono, nombre):
 
     # Maneja la respuesta de requests y devuelve una respuesta adecuada para Django REST Framework
     if response.status_code == 200:
-        return Response({"message": "Mensaje enviado correctamente"})
+        print('Se envio el mensaje')
         
     else:
-        return Response({"error": f"Error al enviar el mensaje: {response.text}"}, status=response.status_code)
+        print(response.status_code)

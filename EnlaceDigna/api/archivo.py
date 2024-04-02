@@ -17,25 +17,25 @@ from ..models import Usuarios, Ultrasonidos
 import magic
 
 def verificar_token(token, num):
-    data_cliente = Cliente.objects.filter(Token=token).first()
-
+    data_cliente = Ultrasonidos.objects.filter(tokenUltrasonido=token).first()
+    print(data_cliente ,'data cliente')
     if data_cliente is None:
         print('Token no encontrado')
         return enviarMessage_errorToken('52' + num[3:])
 
-    id_usuario = data_cliente.usuario_id
-
+    id_usuario =data_cliente.cliente.id
+    print('id cliente= ' , id_usuario)
     data_usuario = Usuarios.objects.filter(id=id_usuario).first()
 
     if data_usuario and data_usuario.NumeroCelular == num[3:]:
         print('Usuario encontrado:', data_usuario)
 
-        urlimg , urlvideo= buscar_urls(data_cliente.id)
+        urlimg , urlvideo= buscar_urls(id_usuario)
 
         print('img:', urlimg)
         print('video', urlvideo)
   
-        return enviar_mensaje('52' + data_usuario.NumeroCelular, data_usuario.Nombre, data_usuario.Apellido_Paterno, urlvideo, urlimg)
+        return enviar_mensaje('52' + data_usuario.NumeroCelular, data_usuario.Nombre, data_usuario.Apellido_Paterno, urlvideo, urlimg, data_cliente.TipoDeUltrasonidos, str(data_cliente.Fecha))
     else:
         print('Usuario no encontrado')
         return enviarMessage_errorToken(num[3:])
