@@ -31,14 +31,11 @@ class Usuarios(models.Model):
 
 class Cliente(models.Model):
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-    Token = models.CharField(max_length=255, null=False)
-    
     def __str__(self):
         return self.Token
 
 class Doctor(models.Model):
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-    # Agregar un campo de contraseña
     Contraseña = models.CharField(max_length=128, default=make_password('1234'))
     def __str__(self):
         return self.usuario.Nombre
@@ -49,9 +46,10 @@ class Doctor(models.Model):
 
 class Ultrasonidos(models.Model):
     ruta_files = models.TextField()
-    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)    
     TipoDeUltrasonidos = models.CharField(max_length=255, null=False)
     Fecha = models.DateField(auto_now_add=True)
+    tokenUltrasonido=models.CharField(max_length=10, null=True)
     
     def __str__(self):
         return f'{self.TipoDeUltrasonidos} - {self.Fecha}'

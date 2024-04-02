@@ -14,7 +14,7 @@ class UltrasonidoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ultrasonidos
-        fields = ['id', 'ruta_files', 'TipoDeUltrasonidos', 'Fecha', 'cliente_id', 'ruta_files_list']
+        fields = ['id', 'ruta_files', 'TipoDeUltrasonidos', 'Fecha', 'cliente_id', 'ruta_files_list', 'tokenUltrasonido']
 
     def get_ruta_files(self, obj):
         # Deserializamos la cadena JSON almacenada en la lista para la respuesta
