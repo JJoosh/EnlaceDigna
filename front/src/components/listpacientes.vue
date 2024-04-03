@@ -83,7 +83,6 @@
                             <form class="buscador" id="buscador" href="buscador">
                               <i class="fa-solid fa-magnifying-glass" style="color: #7d8da1;margin-right: 10PX;"></i>
                                 <input type="text" v-model="searchTerm" name="search" placeholder="Buscar" href="search" class="search" id="search" autocomplete="off">
-                                
                             </form>
                             <ul id="box-search" v-show="showSearchResults" ref="searchResultsList" >
                                 <li v-for="result in searchResults" :key="result.token" class="li1"  @click="showSelectedOrder(result)">

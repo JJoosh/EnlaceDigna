@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import listpacientes from '@/components/listpacientes'
 import lista from '@/components/pacientes/lista'
 import galeria from '@/components/galeria/galeria'
+import galeria1 from '@/components/logins/galeria'
 Vue.use(Router)
 
 export default new Router({
@@ -27,6 +28,11 @@ export default new Router({
       path: '/galeria',
       name: 'galeria',
       component: galeria
+    },
+    {
+      path: '/galeria1',
+      name: 'galeria1',
+      component: galeria1
     }
   ],
   mode: 'history'
