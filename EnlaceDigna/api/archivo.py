@@ -21,7 +21,7 @@ def verificar_token(token, num):
     print(data_cliente ,'data cliente')
     if data_cliente is None:
         print('Token no encontrado')
-        return enviarMessage_errorToken('52' + num[3:])
+        return False
 
     id_usuario =data_cliente.cliente.id
     print('id cliente= ' , id_usuario)
@@ -38,7 +38,7 @@ def verificar_token(token, num):
         return enviar_mensaje('52' + data_usuario.NumeroCelular, data_usuario.Nombre, data_usuario.Apellido_Paterno, urlvideo, urlimg, data_cliente.TipoDeUltrasonidos, str(data_cliente.Fecha))
     else:
         print('Usuario no encontrado')
-        return enviarMessage_errorToken(num[3:])
+        return False
 
 
 
@@ -93,9 +93,9 @@ def buscar_urls(id):
     urlimg = []
     urlvid = []
 
-    # Eliminar corchetes y comillas dobles y luego dividir la cadena en una lista
+    # Elimina corchetes y comillas dobles y luego dividir la cadena en una lista
     url_list = [x.strip('"') for x in urls.strip('[]').split(', ')]
-    extensiones_validasimg = ['jpeg', 'jpg', 'png', 'svg']
+    extensiones_validasimg = ['jpeg', 'jpg', 'png', 'svg', 'gif']
     extensiones_validas_video = ['mp4', 'avi', 'mov', 'mkv', 'wmv', 'flv', 'mpeg']
 
     for url in url_list:
@@ -109,3 +109,5 @@ def buscar_urls(id):
     print(urlimg)
     print(urlvid)
     return urlimg, urlvid
+
+

@@ -10,15 +10,8 @@ from . import views
 
 urlpatterns = [
     path('', UltrasonidoUploadAPIView.as_view(), name='upload'),
-    path('registrar/', views.register, name='register'),      
-    path('dashboard/', views.dashboard_view, name='dashboard'),
-    path('recibir_token/', recibir_tokenWhats, name='recibir_token'),  
-    path('login/', views.login_view, name='login'),
-    # path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
     path('recibir_token/', recibir_tokenWhats, name='recibir token'),
     path('get_galeria/<str:token>/', get_galeria, name='Datos galeria'), #URL DE API
-    path('galeria/', views.galeria, name='Galeria Usuario' ),
-    path('login/', views.login_view, name='login'),
-
+  
 ]
