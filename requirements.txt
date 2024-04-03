@@ -26,7 +26,7 @@ pylibjpeg-libjpeg==2.1.0
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-magic==0.4.27
-#python-magic-bin==0.4.14
+python-magic-bin==0.4.14
 requests==2.31.0
 s3transfer==0.10.1
 setuptools==69.2.0

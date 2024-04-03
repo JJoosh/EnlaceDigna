@@ -10,24 +10,12 @@ class Usuarios(models.Model):
     NumeroCelular = models.CharField(max_length=20, blank=True, null=True)
     Rol = models.CharField(max_length=50, null=False)
 
-     # Agregar el campo last_login
-    is_authenticated = models.BooleanField(default=False)
-    last_login = models.DateTimeField(blank=True, null=True)
-
+    
 
     def __str__(self):
         return f'{self.Nombre} {self.Apellido_Paterno}'
 
-    def save(self, *args, **kwargs):
-        is_new = not self.pk  # Determina si el objeto es nuevo
-        super().save(*args, **kwargs)  # Guarda el objeto Usuario primero
-        
-        if is_new and self.Rol.lower() == 'paciente':
-            # Combina las 2 primeras letras del nombre y apellido con un número aleatorio de 4 dígitos
-            token_prefix = self.Nombre[:2].lower() + self.Apellido_Paterno[:2].lower()
-            token_number = str(random.randint(1000, 9999))
-            token = token_prefix + token_number
-            Cliente.objects.create(usuario=self, Token=token)  # Crea un nuevo Cliente relacionado
+    
 
 class Cliente(models.Model):
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
