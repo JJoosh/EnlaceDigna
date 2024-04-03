@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
-import listpacientes from '@/components/listpacientes'
 import lista from '@/components/pacientes/lista'
 import galeria from '@/components/galeria/galeria'
 import galeria1 from '@/components/logins/galeria'
