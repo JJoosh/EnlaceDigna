@@ -1,12 +1,11 @@
 from django.urls import path
-from .views import dashboard_view
-from . import views
-from .api.views import UltrasonidoUploadAPIView, enviar_verificacion, recibir_tokenWhats
-from rest_framework_simplejwt.views import TokenRefreshView  # Asegúrate de que esto está descomentado y correctamente importado
+
+
+from .api.views import UltrasonidoUploadAPIView, recibir_tokenWhats
 
 from .api.views import UltrasonidoUploadAPIView  # Adjust the import according to your project structure
-from .api.views import enviar_verificacion, recibir_tokenWhats, get_galeria
-from . import views 
+from .api.views import  recibir_tokenWhats, get_galeria
+
 
 urlpatterns = [
     path('', UltrasonidoUploadAPIView.as_view(), name='upload'),
