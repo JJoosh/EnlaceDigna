@@ -88,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'prueba',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': '1234',
         'HOST': 'localhost',   # O la IP del servidor de base de datos si es diferente
         'PORT': '3306',        # El puerto predeterminado para MySQL es el 3306
     }
@@ -130,9 +130,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'EnlaceDigna/static',
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'EnlaceDigna/static',
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
