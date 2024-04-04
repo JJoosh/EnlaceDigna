@@ -16,6 +16,12 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
+
+CORS_ORIGIN_ALLOW_ALLL = True
+
+CORS_ORIGIN_WHITELIST =['http://localhost:8081']
+
+
 ALLOWED_HOSTS = [
     '1076-2806-261-417-5f53-f505-54d2-3df2-a941.ngrok-free.app',
     '127.0.0.1',
@@ -38,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'EnlaceDigna',
     'storages',
+    'corsheaders',
 
 ]
 
@@ -49,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -86,7 +94,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'prueba',
+        'NAME': 'prueba5',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',   # O la IP del servidor de base de datos si es diferente

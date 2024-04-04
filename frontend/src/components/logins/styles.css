@@ -8,6 +8,15 @@
     font-size: 20px;
     list-style: none;
 }
+input
+{
+  border-radius: 20px;
+  margin: 20px;
+  background-color: #e6efe7;
+  width: 60%;
+  height: 40px;
+  padding: 8px; 
+}
 header{
   width: 100%;
   position: fixed;
@@ -321,7 +330,28 @@ main .recent-orders .container:hover{
   .texto1 {
     margin: 0; /* Elimina el margen del párrafo */
   }
-  
+  /* Estilos para la tabla */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Estilos para las filas alternas */
+.table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Estilos para el efecto de resaltado al pasar el mouse */
+.table tbody tr:hover {
+  background-color: #ddd;
+}
+
 @media (max-width: 900px) {
   .menu{
     padding: 30px;

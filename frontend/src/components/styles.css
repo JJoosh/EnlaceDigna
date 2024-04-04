@@ -1,0 +1,65 @@
+*{
+    margin: 0;
+  }
+  .row{
+    display: flex;
+  }
+  /* Estilos específicos del componente */
+  .container-fluid {
+    height: 100vh; /* Establecer la altura al 100% de la ventana del navegador */
+  }
+  
+  /* Lado izquierdo con formulario de login */
+  .bg-white {
+    background-color: #F6F6F9; /* Fondo blanco */
+    width: 45%;
+    height: 100vh;
+  }
+.mb-3{
+    margin-top: 20px;
+}
+  .p-4 {
+    padding: 1.5rem; /* Añadir espacio alrededor del contenido */
+  }
+  
+  /* Ajustar tamaño del formulario en dispositivos pequeños */
+  @media (max-width: 767px) {
+    .bg-white {
+      height: 50vh; /* Reducir altura del lado izquierdo en dispositivos pequeños */
+      overflow-y: auto; /* Agregar scroll si el contenido excede la altura */
+    }
+  }
+  
+  /* Lado derecho con imagen */
+  .bg-secondary {
+    width: 55%;
+    height: 100vh;
+  
+    /* Fondo gris oscuro */
+  }
+  
+  .d-flex {
+    display: flex; /* Usar flexbox para alinear elementos */
+  }
+  
+  .align-items-center {
+    align-items: center; /* Centrar verticalmente */
+  }
+  
+  .justify-content-center {
+    justify-content: center; /* Centrar horizontalmente */
+  }
+  
+  .img-fluid {
+    width: 50vw; /* Ajustar tamaño de la imagen al contenedor */
+    height: 100vh; /* Mantener la proporción de aspecto */
+    object-fit: cover;
+  }
+  /* Ajustar tamaño de la imagen en dispositivos pequeños */
+  @media (max-width: 767px) {
+    .bg-secondary {
+      height: 50vh; /* Reducir altura del lado derecho en dispositivos pequeños */
+      overflow-y: auto; /* Agregar scroll si el contenido excede la altura */
+    }
+  }
+  

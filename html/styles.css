@@ -1,0 +1,46 @@
+*{box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    list-style: none;
+    background-color: #e6efe7;
+}
+.container{
+    width: 100%;
+    margin: 30px 5%;
+}
+.container .title{
+    margin-top: 40px;
+}
+  .both{
+    background-color: #fff;
+          width: 80%;
+          padding: 1.8rem;
+          text-align: center;
+          box-shadow:  0 2rem 3rem rgba(132, 139, 200, 0.18);
+          border-radius: 20px;
+          transition: all 0.3s ease;
+          display: flex;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          gap: 1.4rem;
+          cursor: pointer;
+          align-items: left;
+          justify-content: left;
+          margin: 40px;
+          
+  }
+  
+  .custom-upload-button {
+    display: inline-block;
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: #9ca0a3;
+    color: #fff;
+    border-radius: 5px;
+  }
+  
+  .custom-upload-button:hover {
+    background-color: #9ca0a3;
+  } 
