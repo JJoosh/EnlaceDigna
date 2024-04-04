@@ -2,6 +2,10 @@ from django.db import models
 import random
 from django.contrib.auth.hashers import make_password
 
+class EstadoUsuario(models.Model):
+    telefono = models.CharField(max_length=20, unique=True)
+    opcion_seleccionada = models.CharField(max_length=10, null=True, blank=True)
+
 class Usuarios(models.Model):
     Nombre = models.CharField(max_length=255, null=False)
     Apellido_Paterno = models.CharField(max_length=255, null=False)
@@ -37,6 +41,7 @@ class Ultrasonidos(models.Model):
     TipoDeUltrasonidos = models.CharField(max_length=255, null=False)
     Fecha = models.DateField(auto_now_add=True)
     tokenUltrasonido=models.CharField(max_length=10, null=True)
+    OpcionUltra=models.IntegerField(default=0)
     
     def __str__(self):
         return f'{self.TipoDeUltrasonidos} - {self.Fecha}'

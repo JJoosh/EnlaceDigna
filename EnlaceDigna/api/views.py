@@ -22,8 +22,9 @@ from pydicom.pixel_data_handlers.util import apply_voi_lut
 import pydicom
 from moviepy.editor import VideoFileClip
 import os
+from ..models import EstadoUsuario
 from .api_whatsapp import message_ayuda,enviar_galeria, enviar_gracias, enviarLista, enviar_cambioNumero, enviarMessage_errorToken
-
+from .api_whatsapp import enviarToken_conNumero, enviar_pedirNumero, enviar_cambioNumero, enviarUltra_deLista
 def convertir_avi_a_mp4(avi_path, mp4_path):
     """
     Convierte un archivo AVI a MP4.
@@ -83,7 +84,7 @@ class UltrasonidoUploadAPIView(APIView):
                 with open(mp4_path, 'rb') as f:
                     buffer = BytesIO(f.read())
                 archivo_nombre = f"{os.path.splitext(archivo.name)[0]}.mp4"
-                url = subir_archivo_a_s3(buffer, archivo_nombre, 'token_cliente')
+                url = subir_archivo_a_s3(buffer, archivo_nombre, )
                 rutas_files.append(url)
                 
                 # Eliminar los archivos temporales
@@ -110,6 +111,8 @@ class UltrasonidoUploadAPIView(APIView):
                                     buffer = BytesIO(f.read())
                                 archivo_nombre = f"{archivo.name.rsplit('.', 1)[0]}.mp4"
                                 url = subir_archivo_a_s3(buffer, archivo_nombre, fechaUltrasonido, idPaciente)  # Asume manejo de tokens
+                                rutas_files.append(url)
+
                             else:
                                 # Es un volumen 3D
                                 gif_path = os.path.join(ruta_temporal, f"{archivo.name.rsplit('.', 1)[0]}.gif")
@@ -120,14 +123,15 @@ class UltrasonidoUploadAPIView(APIView):
                                 with open(mp4_path, 'rb') as f:
                                     buffer = BytesIO(f.read())
                                 archivo_nombre = f"{archivo.name.rsplit('.', 1)[0]}.mp4"
-                                url = subir_archivo_a_s3(buffer, archivo_nombre, fechaUltrasonido, idPaciente)  # Asume manejo de tokens
+                                url = subir_archivo_a_s3(buffer, archivo_nombre, fechaUltrasonido, idPaciente)
+                                rutas_files.append(url)  # Asume manejo de tokens
                         else:
                             # Es una sola imagen 2D
                             jpeg_bytes = self.convertir_imagen_a_jpeg(image_data)
                             archivo_nombre_jpeg = f"{archivo.name.rsplit('.', 1)[0]}.jpeg"
                             buffer = BytesIO(jpeg_bytes)
                             url = subir_archivo_a_s3(buffer, archivo_nombre_jpeg, fechaUltrasonido, idPaciente)  # Asume manejo de tokens  # Asume manejo de tokens
-                        
+                            rutas_files.append(url)
                         # Obtener datos DICOM
                         if contador == 0:
                             nombrePaciente, idPaciente, fechaUltrasonido, descripcionUltras = self.agarrar_datosDCM(dicom_data)
@@ -136,7 +140,6 @@ class UltrasonidoUploadAPIView(APIView):
                             print("ID del paciente:", idPaciente)
                             print("Tipo de ultrasonido: ", descripcionUltras)
                         contador += 1
-                        rutas_files.append(url)
                 except pydicom.errors.InvalidDicomError:
                     return Response({"mensaje": f"El archivo {archivo.name} no es un archivo DICOM válido."}, status=status.HTTP_400_BAD_REQUEST)
                 except Exception as e:
@@ -146,17 +149,29 @@ class UltrasonidoUploadAPIView(APIView):
                 return Response({"mensaje": f"Tipo de archivo no soportado para {archivo.name}."}, status=status.HTTP_400_BAD_REQUEST)
 
         enviar_verificacion(idPaciente, nombrePaciente)  
+        try:
+            ultima_opcion_paciente = Ultrasonidos.objects.filter(cliente_id=idPaciente).latest('OpcionUltra')
+            ultima_opcion_valor = ultima_opcion_paciente.OpcionUltra  # Obtener el valor de OpcionUltra del último objeto del paciente
+        except Ultrasonidos.DoesNotExist:
+            ultima_opcion_valor = 0
 
+    # Incrementar el valor de OpcionUltra en 1
+        nuevo_valor_opcion = ultima_opcion_valor + 1
+
+            # Obtener la fecha actual
         fechaUltrasonido = timezone.now().strftime("%Y-%m-%d")
-        
-        ultrasonido_obj = Ultrasonidos.objects.create(ruta_files=json.dumps(rutas_files),
-                                                      TipoDeUltrasonidos=descripcionUltras,  # Cambio el nombre del campo
-                                                      Fecha=fechaUltrasonido,  # Cambio el nombre del campo
-                                                      tokenUltrasonido=generar_token_10_caracteres(),  # Valor por defecto
-                                                      cliente_id=idPaciente)  # Cambio el nombre del campo
-        serializer = UltrasonidoSerializer(ultrasonido_obj)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    # Crear un nuevo objeto Ultrasonidos con el nuevo valor de OpcionUltra
+        ultrasonido_obj = Ultrasonidos.objects.create(ruta_files=json.dumps(rutas_files),
+                                                  TipoDeUltrasonidos=descripcionUltras,
+                                                  Fecha=fechaUltrasonido,
+                                                  tokenUltrasonido=generar_token_10_caracteres(),
+                                                  cliente_id=idPaciente,
+                                                  OpcionUltra=nuevo_valor_opcion)
+    
+        serializer = UltrasonidoSerializer(ultrasonido_obj)
+    
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     def procesar_dicom(self, dicom_data):
         # Apply necessary transformations to the DICOM image
         image_data = apply_voi_lut(dicom_data.pixel_array, dicom_data)
@@ -257,6 +272,7 @@ def enviar_verificacion(cliente_id, nombrePaciente):
     print(nombre, ' asdasd',  codigo_area + num_telefono)                                                      
     return message_pedirToken(codigo_area + num_telefono, nombre)
 
+
 @api_view(['POST', 'GET'])
 def recibir_tokenWhats(request):
     if request.method == "GET":
@@ -281,51 +297,41 @@ def recibir_tokenWhats(request):
                     timestamp_mensaje = message.get('timestamp')
                     if mensaje and telefono and timestamp_mensaje:
                         timestamp_mensaje = datetime.fromtimestamp(int(timestamp_mensaje))
-                       
-                        if timestamp_mensaje > timestamp_solicitud:
+                        if timestamp_mensaje >= timestamp_solicitud:
                             print('Procesando mensaje:', mensaje)
                             print('Procesando teléfono:', telefono)
-                            verificacion= verificar_token(mensaje, telefono)
-
-                            if verificacion==False:
-                                mensaje
-                                if mensaje=='1':
-                                    message_ayuda('52'+ telefono[3:])
-                                elif is_date_format(mensaje):
-                                    print("comando para devolver un ultrasonido por la fecha")
-                                elif mensaje=='2':
-                                    enviar_galeria(telefono[3:])
-
-                                elif mensaje=='3':
-                                    print("comando de nuevo numero para enviar por gmail")
-                                elif mensaje== '4':
-                                    print("comando para enviar token dependiendo de su numero")
-                                elif mensaje=='gracias' or mensaje=='Gracias' or mensaje== "GRACIAS":
-                                    enviar_gracias(telefono[3:])
-                                elif mensaje=='5':
-                                    enviarLista(telefono[3:])
-
-                                elif len(mensaje) == 10 and mensaje.isdigit():
-                                    enviar_cambioNumero(mensaje, telefono[3:])
+                            verificacion = verificar_token(mensaje, telefono)
+                            if verificacion == False:
+                                estado_usuario, created = EstadoUsuario.objects.get_or_create(telefono=telefono)
+                                if estado_usuario.opcion_seleccionada == '5':
+                                    enviarUltra_deLista(telefono[3:], mensaje)
+                                    estado_usuario.opcion_seleccionada = None
+                                    estado_usuario.save()
                                 else:
-                                    enviarMessage_errorToken( '52'+ telefono[3:])
-
-                            
+                                    if mensaje == '1' or mensaje=="Hola" or mensaje=="hola" or mensaje=="HOLA":
+                                        message_ayuda('52' + telefono[3:])
+                                    
+                                    elif mensaje == '2':
+                                        enviar_galeria(telefono[3:])
+                                    elif mensaje == '3':
+                                        enviar_pedirNumero(telefono[3:])
+                                    elif mensaje == '4':
+                                        enviarToken_conNumero(telefono[3:])
+                                    elif mensaje == 'gracias' or mensaje == 'Gracias' or mensaje == "GRACIAS":
+                                        enviar_gracias(telefono[3:])
+                                    elif mensaje == '5':
+                                        estado_usuario.opcion_seleccionada = '5'
+                                        estado_usuario.save()
+                                        enviarLista(telefono[3:])
+                                    elif len(mensaje) == 10 and mensaje.isdigit():
+                                        enviar_cambioNumero(mensaje, telefono[3:])
+                                    else:
+                                        enviarMessage_errorToken('52' + telefono[3:])
+                            else:
+                                print('Mensaje recibido después de la solicitud POST. Ignorando.')
                         else:
-                            print('Mensaje recibido despues de la solicitud POST. Ignorando.')
- 
+                            print('Mensaje recibido después de la solicitud POST. Ignorando.')
         return Response({"status": "success"})
-
-def is_date_format(input_string):
-    date_formats = [
-        r"\d{4}-\d{2}-\d{2}",   # Formato YYYY-MM-DD
-        r"\d{2}/\d{2}/\d{4}",   # Formato DD/MM/YYYY
-        r"\d{2}/\d{2}/\d{2}"    # Formato DD/MM/YY
-    ]
-    for date_format in date_formats:
-        if re.match(date_format, input_string):
-            return True
-    return False
 
 @api_view(['GET'])
 def get_galeria(request, token):
