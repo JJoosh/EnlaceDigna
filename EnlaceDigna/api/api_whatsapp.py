@@ -29,7 +29,7 @@ def enviarMessage_errorToken(telefono):
               +"3-📱 Verificacion para cambiar tu numero de telefono.\n"
               +"4-🔑 Obten tu token unico.\n"
               +"5-📋 Historial para ver tus ultrasonidos en forma de lista.\n"
-              "✏️ También puedes ingresar la fecha dia/mes/año 📅 para resultados específicos. ¡Estoy aquí para ayudarte en todo lo que necesites!"
+              
 
         }
     }
@@ -316,7 +316,7 @@ def message_ayuda(numero):
                   +"3-📱 Verificacion para cambiar tu numero de telefono.\n"
                   +"4-🔑 Obten tu token unico.\n"
                   +"5-📋 Historial para ver tus ultrasonidos en forma de lista.\n"
-                  +"✏️ También puedes ingresar la fecha dia/mes/año 📅 para resultados específicos. ¡Estoy aquí para ayudarte en todo lo que necesites!"
+                  
 
         }
     }

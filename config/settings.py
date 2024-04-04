@@ -17,7 +17,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
-    '59d6-189-203-103-194.ngrok-free.app',
+    'e8db-189-203-103-194.ngrok-free.app',
     '127.0.0.1',
 ]
 
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'EnlaceDigna',
     'storages',
+    'drf_yasg',
 
 ]
 
@@ -155,8 +156,7 @@ AUTHENTICATION_BACKENDS = [
     # Puedes listar otros backends aquí
 ]
 
-LOGIN_REDIRECT_URL = 'dashboard' 
-LOGIN_URL = 'login'
+
 
 
 # En settings.py
