@@ -62,12 +62,4 @@ def ObtenerURL_Opcion(opcion):
     urls=dataUltra.ruta_files
     fecha=dataUltra.Fecha
     nombre=dataUltra.TipoDeUltrasonidos
-
-    idCliente=dataUltra.cliente.id
-
-    dataCliente=Cliente.objects.filter(id=idCliente).first()
-    
-    dataUssers=Usuarios.objects.filter(id=dataCliente.usuario.id).first()
-
-    
     return urls, fecha, nombre

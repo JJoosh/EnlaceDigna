@@ -1,17 +1,9 @@
 # archivo.py
-import os
+
 from urllib.parse import quote_plus
 import boto3
 from django.conf import settings
-from django.shortcuts import get_object_or_404
-import requests
-import urllib.request
-from ..models import Cliente
-from rest_framework.response import Response
-from rest_framework import status
 from .api_whatsapp import enviar_mensaje
-from django.core.exceptions import ObjectDoesNotExist
-from .api_whatsapp import enviarMessage_errorToken
 from ..models import Usuarios, Ultrasonidos
 import magic
 
@@ -30,20 +22,12 @@ def verificar_token(token, num):
         print('Usuario encontrado:', data_usuario)
 
         urlimg , urlvideo= buscar_urls(id_usuario)
-
         print('img:', urlimg)
         print('video', urlvideo)
-  
         return enviar_mensaje('52' + data_usuario.NumeroCelular, data_usuario.Nombre, data_usuario.Apellido_Paterno, urlvideo, urlimg, data_cliente.TipoDeUltrasonidos, str(data_cliente.Fecha))
     else:
         print('Usuario no encontrado')
         return False
-
-
-
-from urllib.parse import quote
-import boto3
-from django.conf import settings
 
 
 def subir_archivo_a_s3(buffer, nombre_archivo, fecha, idcliente):
