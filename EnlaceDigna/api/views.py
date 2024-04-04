@@ -1,265 +1,145 @@
-import re
-import secrets
-import string
-from django.utils import timezone
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
-from django.http import HttpResponse
-from io import BytesIO
-import numpy as np
-from ..models import Cliente, Ultrasonidos, Usuarios
-from .serializer import UltrasonidoSerializer
-from .archivo import subir_archivo_a_s3, verificar_token
-import json
-from datetime import datetime
-from PIL import Image
-from .api_whatsapp import message_pedirToken
-from io import BytesIO
-from pydicom.pixel_data_handlers.util import apply_voi_lut
-import pydicom
-from moviepy.editor import VideoFileClip
+import SimpleITK as sitk
+import tempfile
 import os
-from ..models import EstadoUsuario
+from datetime import datetime
+import random
+import string
+
+from EnlaceDigna.api.api_whatsapp import enviarUltra_deLista, message_pedirToken
+from ..models import EstadoUsuario, Ultrasonidos, Cliente, Usuarios
+from .archivo import subir_archivo_a_s3, verificar_token
+from .serializer import UltrasonidoSerializer
+import json
+import shutil
+import imageio
+from rest_framework.decorators import api_view
 from .api_whatsapp import message_ayuda,enviar_galeria, enviar_gracias, enviarLista, enviar_cambioNumero, enviarMessage_errorToken
 from .api_whatsapp import enviarToken_conNumero, enviar_pedirNumero, enviar_cambioNumero, enviarUltra_deLista
-def convertir_avi_a_mp4(avi_path, mp4_path):
-    """
-    Convierte un archivo AVI a MP4.
-    """
-    clip = VideoFileClip(avi_path)
-    clip.write_videofile(mp4_path)
-    clip.close()
 
-def convertir_gif_a_mp4(gif_path, mp4_path):
-    """
-    Convierte un archivo GIF a MP4.
-    """
-    clip = VideoFileClip(gif_path)
-    clip.write_videofile(mp4_path)
-    clip.close()
+
 
 class UltrasonidoUploadAPIView(APIView):
-
-    def post(self, request, *args, **kwargs):
+    def post(self, request, format=None):
         archivos = request.FILES.getlist('archivo')
         if not archivos:
-            return Response({"mensaje": "No se encontraron archivos para subir."}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response({'error': 'No se han enviado archivos'}, status=status.HTTP_400_BAD_REQUEST)
+
         rutas_files = []
-        idPaciente = "Desconocido"
-        nombrePaciente = "Desconocido"
-        fechaUltrasonido = "Desconocido"
-        descripcionUltras = "Desconocido"
-        contador = 0
+        metadatos_files = []
         
-        # Obtener la ruta del directorio temporal
-        ruta_temporal = os.environ.get('TEMP', '/tmp')  # Si no se encuentra, usa '/tmp' como valor predeterminado en sistemas Unix
+        for file in archivos:
+            temp_file_path = None
+            try:
+                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                    for chunk in file.chunks():
+                        temp_file.write(chunk)
+                    temp_file_path = temp_file.name
+                
+                image = sitk.ReadImage(temp_file_path)
+                metadata = {key: image.GetMetaData(key) for key in image.GetMetaDataKeys()}
+                metadatos_files.append(metadata)
+                id_cliente = metadata.get('0010|0020')
+                TipoUltrasonido = metadata.get('0008|1030')
+                if not id_cliente:
+                    return Response({'error': 'No se ha encontrado el ID del cliente en los metadatos del DICOM'}, status=status.HTTP_400_BAD_REQUEST)
 
-        for archivo in archivos:
-            extension = archivo.name.rsplit('.', 1)[-1].lower()
-            if extension in ['jpeg', 'jpg']:
-                # Procesamiento de archivos de imagen
-                buffer = BytesIO(archivo.read())
-                archivo_nombre = f"{archivo.name}"
-                url = subir_archivo_a_s3(buffer, archivo_nombre, 'token_cliente')  # Asume manejo de tokens
-                rutas_files.append(url)
-            elif extension in ['mp4']:
-                # Procesamiento de archivos de video MP4
-                buffer = BytesIO(archivo.read())
-                archivo_nombre = f"{archivo.name}"
-                url = subir_archivo_a_s3(buffer, archivo_nombre, 'token_cliente')
-                rutas_files.append(url)
-            elif extension in ['avi']:
-                # Procesamiento de archivos de video AVI
-                avi_path = os.path.join(ruta_temporal, archivo.name)
-                with open(avi_path, 'wb') as f:
-                    f.write(archivo.read())
-                
-                mp4_path = os.path.join(ruta_temporal, os.path.splitext(archivo.name)[0] + '.mp4')
-                convertir_avi_a_mp4(avi_path, mp4_path)
-                
-                with open(mp4_path, 'rb') as f:
-                    buffer = BytesIO(f.read())
-                archivo_nombre = f"{os.path.splitext(archivo.name)[0]}.mp4"
-                url = subir_archivo_a_s3(buffer, archivo_nombre, )
-                rutas_files.append(url)
-                
-                # Eliminar los archivos temporales
-                os.remove(avi_path)
-                os.remove(mp4_path)
-            elif extension in ['dcm']:
-                try:
-                    dicom_data = pydicom.dcmread(archivo)
-                    
-                    if 'PixelData' in dicom_data:
-                        # Procesamiento específico para archivos DICOM
-                        image_data = self.procesar_dicom(dicom_data)
-                        
-                        # Verificar si es un volumen 3D o 4D
-                        if 'NumberOfFrames' in dicom_data:
-                            if dicom_data.NumberOfFrames > 1:
-                                # Es un volumen 4D
-                                gif_path = os.path.join(ruta_temporal, f"{archivo.name.rsplit('.', 1)[0]}.gif")
-                                mp4_path = os.path.join(ruta_temporal, f"{archivo.name.rsplit('.', 1)[0]}.mp4")
-                                self.convertir_volumen_a_gif(image_data, gif_path)
-                                convertir_gif_a_mp4(gif_path, mp4_path)
-                                
-                                with open(mp4_path, 'rb') as f:
-                                    buffer = BytesIO(f.read())
-                                archivo_nombre = f"{archivo.name.rsplit('.', 1)[0]}.mp4"
-                                url = subir_archivo_a_s3(buffer, archivo_nombre, fechaUltrasonido, idPaciente)  # Asume manejo de tokens
-                                rutas_files.append(url)
+                dimension = image.GetDepth()
+                print(dimension)
 
-                            else:
-                                # Es un volumen 3D
-                                gif_path = os.path.join(ruta_temporal, f"{archivo.name.rsplit('.', 1)[0]}.gif")
-                                mp4_path = os.path.join(ruta_temporal, f"{archivo.name.rsplit('.', 1)[0]}.mp4")
-                                self.convertir_volumen_a_gif(image_data, gif_path)
-                                convertir_gif_a_mp4(gif_path, mp4_path)
-                                
-                                with open(mp4_path, 'rb') as f:
-                                    buffer = BytesIO(f.read())
-                                archivo_nombre = f"{archivo.name.rsplit('.', 1)[0]}.mp4"
-                                url = subir_archivo_a_s3(buffer, archivo_nombre, fechaUltrasonido, idPaciente)
-                                rutas_files.append(url)  # Asume manejo de tokens
-                        else:
-                            # Es una sola imagen 2D
-                            jpeg_bytes = self.convertir_imagen_a_jpeg(image_data)
-                            archivo_nombre_jpeg = f"{archivo.name.rsplit('.', 1)[0]}.jpeg"
-                            buffer = BytesIO(jpeg_bytes)
-                            url = subir_archivo_a_s3(buffer, archivo_nombre_jpeg, fechaUltrasonido, idPaciente)  # Asume manejo de tokens  # Asume manejo de tokens
+                nombre_archivo_sin_espacios = file.name.replace(' ', '')
+
+                # Crear una carpeta para guardar los archivos
+                output_folder = tempfile.mkdtemp()
+                
+                # Iterar sobre los frames y guardarlos como imágenes JPEG si es 2D,
+                # o crear un video MP4 si es 3D o 4D
+                
+                if dimension == 1:
+                    print(dimension)
+                    image_files = []
+                    for i in range(image.GetDepth()):
+                        image_slice = image[:, :, i]
+                        image_array = sitk.GetArrayFromImage(image_slice)
+                        # Guardar el frame como una imagen JPEG
+                        output_path = os.path.join(output_folder, f'frame_{i:04d}.jpg')
+                        sitk.WriteImage(image_slice, output_path)
+                        image_files.append(output_path)
+    
+                    # Subir las imágenes JPEG a Amazon S3
+                    for image_file in image_files:
+                        with open(image_file, 'rb') as data:
+                            fecha = datetime.now().date().strftime('%Y-%m-%d')
+                            jpeg_filename = os.path.basename(image_file)
+                            url = subir_archivo_a_s3(data, jpeg_filename, fecha, id_cliente)
                             rutas_files.append(url)
-                        # Obtener datos DICOM
-                        if contador == 0:
-                            nombrePaciente, idPaciente, fechaUltrasonido, descripcionUltras = self.agarrar_datosDCM(dicom_data)
-                            print("Nombre del paciente:", nombrePaciente)
-                            print("Fecha del estudio:", fechaUltrasonido)
-                            print("ID del paciente:", idPaciente)
-                            print("Tipo de ultrasonido: ", descripcionUltras)
-                        contador += 1
-                except pydicom.errors.InvalidDicomError:
-                    return Response({"mensaje": f"El archivo {archivo.name} no es un archivo DICOM válido."}, status=status.HTTP_400_BAD_REQUEST)
-                except Exception as e:
-                    return Response({"mensaje": f"Error procesando el archivo {archivo.name}: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                print(archivo, 'prueba')
-                return Response({"mensaje": f"Tipo de archivo no soportado para {archivo.name}."}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    image_files = []
+                    for i in range(image.GetDepth()):
+                        if dimension == 4:
+                            image_slice = image[:, :, :, i]
+                        else:
+                            image_slice = image[:, :, i]
+                        image_array = sitk.GetArrayFromImage(image_slice)
+                        # Guardar el frame como una imagen PNG
+                        output_path = os.path.join(output_folder, f'frame_{i:04d}.png')
+                        sitk.WriteImage(image_slice, output_path)
+                        image_files.append(output_path)
 
-        enviar_verificacion(idPaciente, nombrePaciente)  
-        try:
-            ultima_opcion_paciente = Ultrasonidos.objects.filter(cliente_id=idPaciente).latest('OpcionUltra')
-            ultima_opcion_valor = ultima_opcion_paciente.OpcionUltra  # Obtener el valor de OpcionUltra del último objeto del paciente
-        except Ultrasonidos.DoesNotExist:
-            ultima_opcion_valor = 0
+                    # Crear el video MP4 a partir de las imágenes utilizando imageio
+                    mp4_filename = nombre_archivo_sin_espacios.rsplit('.', 1)[0] + ".mp4"
+                    temp_mp4_path = os.path.join(tempfile.gettempdir(), mp4_filename)
+                    with imageio.get_writer(temp_mp4_path, format='FFMPEG', mode='I', fps=10) as writer:
+                        for image_file in image_files:
+                            writer.append_data(imageio.imread(image_file))
 
-    # Incrementar el valor de OpcionUltra en 1
-        nuevo_valor_opcion = ultima_opcion_valor + 1
+                    with open(temp_mp4_path, 'rb') as data:
+                        fecha = datetime.now().date().strftime('%Y-%m-%d')
+                        url = subir_archivo_a_s3(data, mp4_filename, fecha, id_cliente)
+                        rutas_files.append(url)
+                    os.remove(temp_mp4_path)
 
-            # Obtener la fecha actual
-        fechaUltrasonido = timezone.now().strftime("%Y-%m-%d")
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            finally:
+                if temp_file_path and os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)  # Ensure the temporary file is cleaned up
+                if os.path.exists(output_folder):
+                    shutil.rmtree(output_folder)  # Ensure the temporary folder is cleaned up
 
-    # Crear un nuevo objeto Ultrasonidos con el nuevo valor de OpcionUltra
-        ultrasonido_obj = Ultrasonidos.objects.create(ruta_files=json.dumps(rutas_files),
-                                                  TipoDeUltrasonidos=descripcionUltras,
-                                                  Fecha=fechaUltrasonido,
-                                                  tokenUltrasonido=generar_token_10_caracteres(),
-                                                  cliente_id=idPaciente,
-                                                  OpcionUltra=nuevo_valor_opcion)
-    
-        serializer = UltrasonidoSerializer(ultrasonido_obj)
-    
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    def procesar_dicom(self, dicom_data):
-        # Apply necessary transformations to the DICOM image
-        image_data = apply_voi_lut(dicom_data.pixel_array, dicom_data)
-
-        # Convert to grayscale by taking the mean of RGB channels
-        # Adjust pixel intensity range for better contrast
-        
-
-        # Check if it's a 3D or 4D volume
-        if 'NumberOfFrames' in dicom_data:
-            if dicom_data.NumberOfFrames > 1:
-                
-                image_data = image_data.mean(axis=-1)
-                # Adjust pixel intensity range for better contrast
-                min_val, max_val = np.percentile(image_data, (2, 98))
-                image_data = np.clip(image_data, min_val, max_val)
-                image_data = ((image_data - min_val) / (max_val - min_val)) * 255
-                image_data = image_data.astype(np.uint8)
-                return image_data
-            else:
-                image_data = image_data.mean(axis=-1)
-                # Adjust pixel intensity range for better contrast
-                min_val, max_val = np.percentile(image_data, (2, 98))
-                image_data = np.clip(image_data, min_val, max_val)
-                image_data = ((image_data - min_val) / (max_val - min_val)) * 255
-                image_data = image_data.astype(np.uint8)
-                return image_data
+        cliente, created = Cliente.objects.get_or_create(id=id_cliente)
+        token = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        data = Ultrasonidos.objects.filter(cliente=id_cliente).last()
+        if data:
+             ultimo_valor_opcion = data.OpcionUltra + 1
         else:
-            min_val, max_val = np.percentile(image_data, (2, 98))
-            image_data = np.clip(image_data, min_val, max_val)
-            image_data = ((image_data - min_val) / (max_val - min_val)) * 255
-            image_data = image_data.astype(np.uint8)
-            
-            return image_data
+            ultimo_valor_opcion = 0
+        ultrasonido_obj = Ultrasonidos.objects.create(
+            ruta_files=json.dumps(rutas_files),
+            TipoDeUltrasonidos=TipoUltrasonido,
+            Fecha=datetime.now().date(),
+            tokenUltrasonido=token,
+            cliente=cliente,
+            OpcionUltra=ultimo_valor_opcion
+        )
+
+        serializer = UltrasonidoSerializer(ultrasonido_obj)
+        enviar_verificacion(id_cliente)
+
+        response_data = {
+            'data': serializer.data,
+            'metadata': metadatos_files
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
- 
-    def convertir_volumen_a_gif(self, volumen, gif_path):
-        # Convierte un volumen (secuencia de imágenes numpy) a GIF
-        frames = [Image.fromarray(imagen) for imagen in volumen]
-        frames[0].save(gif_path, format='GIF', save_all=True, append_images=frames[1:], loop=0)
 
-    def convertir_volumen_a_mp4(self, volumen, mp4_path):
-        # Convierte un volumen (secuencia de imágenes numpy) a MP4
-        frames = [Image.fromarray(imagen) for imagen in volumen]
-        clip = VideoFileClip(fps=24, pixelsize=(frames[0].width, frames[0].height))
-        for frame in frames:
-            clip.write_frame(np.array(frame))
-        clip.write_videofile(mp4_path)
-        clip.close()
-
-
-    def agarrar_datosDCM(self, dicom_data):
-        try:
-            # Obtener datos de las etiquetas DICOM relevantes
-            paciente_nombre = dicom_data.PatientName if hasattr(dicom_data, 'PatientName') else "Desconocido"
-            estudio_fecha = dicom_data.StudyDate if hasattr(dicom_data, 'StudyDate') else "Desconocido"
-            paciente_id = dicom_data.PatientID if hasattr(dicom_data, 'PatientID') else "Desconocido"
-            tipo_ultrasonido = dicom_data.Modality if hasattr(dicom_data, 'Modality') else "Desconocido"
-            descripcion_ultrasonido = dicom_data.StudyDescription if hasattr(dicom_data, 'StudyDescription') else "Desconocido"
-            return paciente_nombre, paciente_id, estudio_fecha, descripcion_ultrasonido
-
-        except Exception as e:
-            print("Error al procesar el archivo DICOM:", str(e))
-
-    def convertir_imagen_a_jpeg(self, imagen):
-        # Convierte una imagen numpy a JPEG
-        with BytesIO() as output:
-            if imagen.ndim == 2:
-                # Si la imagen es de un solo canal (escala de grises), conviértela a RGB
-                imagen = np.repeat(imagen[..., np.newaxis], 3, axis=-1)
-            elif imagen.ndim == 3 and imagen.shape[-1] == 4:
-                # Si la imagen tiene un canal alfa, elimínalo
-                imagen = imagen[..., :3]
-            
-            Image.fromarray(imagen).convert('RGB').save(output, format='JPEG')
-            jpeg_bytes = output.getvalue()
-        return jpeg_bytes
-
-
-def generar_token_10_caracteres():
-    # Define el alfabeto para el token: letras (mayúsculas y minúsculas) y dígitos
-    alfabeto = string.ascii_letters + string.digits
-    # Genera un token de 10 caracteres aleatorios
-    token = ''.join(secrets.choice(alfabeto) for _ in range(10))
-    return token
-
-def enviar_verificacion(cliente_id, nombrePaciente):
+def enviar_verificacion(cliente_id):
     data_cliente = get_object_or_404(Cliente, id=cliente_id)
     id_usuario = data_cliente.usuario.id
     print('Este es el id:', id_usuario)
@@ -274,7 +154,7 @@ def enviar_verificacion(cliente_id, nombrePaciente):
 
 
 @api_view(['POST', 'GET'])
-def recibir_tokenWhats(request):
+def receive_messages(request):
     if request.method == "GET":
         if request.GET.get('hub.verify_token') == "12345":
             return HttpResponse(request.GET.get('hub.challenge'))
@@ -297,7 +177,7 @@ def recibir_tokenWhats(request):
                     timestamp_mensaje = message.get('timestamp')
                     if mensaje and telefono and timestamp_mensaje:
                         timestamp_mensaje = datetime.fromtimestamp(int(timestamp_mensaje))
-                        if timestamp_mensaje >= timestamp_solicitud:
+                        if timestamp_mensaje == timestamp_solicitud or timestamp_mensaje>timestamp_solicitud:
                             print('Procesando mensaje:', mensaje)
                             print('Procesando teléfono:', telefono)
                             verificacion = verificar_token(mensaje, telefono)
@@ -328,7 +208,7 @@ def recibir_tokenWhats(request):
                                     else:
                                         enviarMessage_errorToken('52' + telefono[3:])
                             else:
-                                print('Mensaje recibido después de la solicitud POST. Ignorando.')
+                                print('Mensaje recibido antes de la solicitud POST. Ignorando.')
                         else:
                             print('Mensaje recibido después de la solicitud POST. Ignorando.')
         return Response({"status": "success"})

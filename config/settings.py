@@ -23,7 +23,7 @@ CORS_ORIGIN_WHITELIST =['http://localhost:8081']
 
 
 ALLOWED_HOSTS = [
-    '1076-2806-261-417-5f53-f505-54d2-3df2-a941.ngrok-free.app',
+    'e8db-189-203-103-194.ngrok-free.app',
     '127.0.0.1',
 ]
 
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'EnlaceDigna',
     'storages',
+    'drf_yasg',
     'corsheaders',
 
 ]
@@ -163,8 +164,7 @@ AUTHENTICATION_BACKENDS = [
     # Puedes listar otros backends aquí
 ]
 
-LOGIN_REDIRECT_URL = 'dashboard' 
-LOGIN_URL = 'login'
+
 
 
 # En settings.py

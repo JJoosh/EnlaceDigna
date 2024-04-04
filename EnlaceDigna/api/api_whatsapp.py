@@ -11,10 +11,8 @@ def getURL():
 
 
 def getToken():
-    access_token = "EABPlBU5h77QBO9bCxt3VvIbONkXO9WanyjspZCF2ixx6OCA4PTuCE8McZAACixhDCkzr4kGmOhVc0CMeYQAI4CkMS8MN6QRhyjtRJDsD0NPA3KQ7H03tuwhivENrjXLZAvqmesh0g4xfPK3DDIZB1zrT64VAF1puFR1ZAuLUsKP4SPlEZBCmE51zZAvyxYwZBSBZCTxYA2PZAtZBD5XnQOZAkyKF"
+    access_token = "EABPlBU5h77QBO2pRFScsPtMcaDR8zqvHaRPxmM0mvztmNcjAXTO0BvjNLFrbwZCNDd3gGLR8W0gZA2csWL5byget9hI2WrqBZCJzpRBIH4SbIrdSNDOH50uUWPQiaG6OsopRs5feMoSrTSC0iex8Ecto0qQLM9V11uvfTxBFkM9cnrInZAOZCrMfPUkH5vM6K"
     return access_token
-
-
 
 def enviarMessage_errorToken(telefono):
     print(telefono)
@@ -31,7 +29,7 @@ def enviarMessage_errorToken(telefono):
               +"3-📱 Verificacion para cambiar tu numero de telefono.\n"
               +"4-🔑 Obten tu token unico.\n"
               +"5-📋 Historial para ver tus ultrasonidos en forma de lista.\n"
-              "✏️ También puedes ingresar la fecha dia/mes/año 📅 para resultados específicos. ¡Estoy aquí para ayudarte en todo lo que necesites!"
+              
 
         }
     }
@@ -318,7 +316,7 @@ def message_ayuda(numero):
                   +"3-📱 Verificacion para cambiar tu numero de telefono.\n"
                   +"4-🔑 Obten tu token unico.\n"
                   +"5-📋 Historial para ver tus ultrasonidos en forma de lista.\n"
-                  +"✏️ También puedes ingresar la fecha dia/mes/año 📅 para resultados específicos. ¡Estoy aquí para ayudarte en todo lo que necesites!"
+                  
 
         }
     }
@@ -626,6 +624,4 @@ def enviarUltra_deLista(telefono, mensaje):
              "Authorization": f"Bearer {getToken()}",
              "Content-Type": "application/json"
          }
-
-        
          response = requests.post(getURL(), headers=headers, json=data)
