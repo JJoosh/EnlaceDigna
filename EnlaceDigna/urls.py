@@ -10,8 +10,8 @@ from .api.views import  receive_messages, get_galeria
 urlpatterns = [
     path('', UltrasonidoUploadAPIView.as_view(), name='upload'),
     
-    path('recibir_token/', receive_messagess, name='recibir token'),
-    path('get_galeria/<str:token>/', get_galeria, name='Datos galeria'), #URL DE API
+    path('receive_messagess/', receive_messages, name='recibir token'),
+    path('get_galeria/<int:id>/', get_galeria, name='Datos galeria'), #URL DE API
   
 ]
 

@@ -25,6 +25,7 @@ from .api_whatsapp import enviarToken_conNumero, enviar_pedirNumero, enviar_camb
 
 class UltrasonidoUploadAPIView(APIView):
     def post(self, request, format=None):
+        print(request)
         archivos = request.FILES.getlist('archivo')
         if not archivos:
             return Response({'error': 'No se han enviado archivos'}, status=status.HTTP_400_BAD_REQUEST)
@@ -177,7 +178,7 @@ def receive_messages(request):
                     timestamp_mensaje = message.get('timestamp')
                     if mensaje and telefono and timestamp_mensaje:
                         timestamp_mensaje = datetime.fromtimestamp(int(timestamp_mensaje))
-                        if timestamp_mensaje == timestamp_solicitud or timestamp_mensaje>timestamp_solicitud:
+                        if timestamp_mensaje < timestamp_solicitud :
                             print('Procesando mensaje:', mensaje)
                             print('Procesando teléfono:', telefono)
                             verificacion = verificar_token(mensaje, telefono)
@@ -214,9 +215,9 @@ def receive_messages(request):
         return Response({"status": "success"})
 
 @api_view(['GET'])
-def get_galeria(request, token):
+def get_galeria(request, id):
     try:
-        cliente = Cliente.objects.get(Token=token)
+        cliente = Cliente.objects.get(id=id)
         datos_ultrasonido = Ultrasonidos.objects.filter(cliente=cliente)
         
         data = [{'ruta_files': ultrasonido.ruta_files, 'TipoDeUltrasonidos': ultrasonido.TipoDeUltrasonidos, 'Fecha': ultrasonido.Fecha} for ultrasonido in datos_ultrasonido]

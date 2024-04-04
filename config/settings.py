@@ -23,8 +23,9 @@ CORS_ORIGIN_WHITELIST =['http://localhost:8081']
 
 
 ALLOWED_HOSTS = [
-    'e8db-189-203-103-194.ngrok-free.app',
+    '52f2-189-203-103-194.ngrok-free.app',
     '127.0.0.1',
+    'localhost',
 ]
 
 REST_FRAMEWORK = {
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'EnlaceDigna',
     'storages',
-    'drf_yasg',
+    
     'corsheaders',
 
 ]

@@ -44,3 +44,17 @@
   .custom-upload-button:hover {
     background-color: #9ca0a3;
   } 
+  .btn {
+    /* Estilos del botón */
+    padding: 10px 20px;
+    border: none;
+    background-color: #5a5e62;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .btn:hover {
+    /* Estilos cuando el mouse está encima */
+    background-color: #606264;
+  }

@@ -112,7 +112,7 @@ def enviar_galeriaResultados(telefono):
         "type": "text",
         "text": {
             "preview_url": True,
-            "body": "Recuerda que puedes ingresar a tu galeria para consultar todos tus resultados anteriores de ultrasonido. 🔍 Ingresa con tu token para acceder a la información. ¡Estoy aquí para ayudarte😊!\nhttps://www.salud-digna.org/"
+            "body": "Recuerda que puedes ingresar a tu galeria para consultar todos tus resultados anteriores de ultrasonido. 🔍 Ingresa con tu token para acceder a la información. ¡Estoy aquí para ayudarte😊!\nhttp://localhost:8081/"
         }
     }
     headers = {
@@ -137,7 +137,7 @@ def enviar_galeria(telefono):
         "type": "text",
         "text": {
             "preview_url": True,
-            "body": "Hola!😊 puedes ingresar a tu galeria para consultar todos tus resultados anteriores de ultrasonido. 🔍 Ingresa con tu token para acceder a la información. ¡Estoy aquí para ayudarte!\nhttps://www.salud-digna.org/"
+            "body": "Hola!😊 puedes ingresar a tu galeria para consultar todos tus resultados anteriores de ultrasonido. 🔍 Ingresa con tu token para acceder a la información. ¡Estoy aquí para ayudarte!\nhttp://localhost:8081/"
         }
     }
     headers = {

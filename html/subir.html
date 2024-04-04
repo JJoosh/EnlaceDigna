@@ -8,12 +8,15 @@
 </head>
 <body>
     <div class="container"> 
-        <h1 class="title">simulador de ultrasonido</h1>
-        <form class="both" action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+        <h1 class="title">SIMULADOR DE ULTRASONIDO, ESTO SOLO SIMULA UN ULTRASONIDO YA QUE NUESTRA API TOMARA DIRECTO LOS dcm DE LA MAQUINA DE ULTRASONIDO</h1>
+        <form class="both" method="post" enctype="multipart/form-data" action="http://localhost:8000/" id="archivo">
             <label for="files" class="custom-upload-button">
               <i class="fa-solid fa-image"></i> Subir archivos
             </label>
-            <input type="file" name="files[]" id="files" multiple accept="image/*, video/*" style="display: none;">
-          </form></div>
+            <input type="file" name="archivo" id="files" multiple style="display: none;">
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    </div>
 </body>
 </html>
+
