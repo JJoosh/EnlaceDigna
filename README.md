@@ -1,6 +1,6 @@
 # EnlaceDigna
 
-> En el repositorio oficial para el Hackathon Talent Land, encontrarás el proyecto EnlaceDigna, que incluye una API REST y un chatbot. Esta API ofrece servicios para la extracción, compresión y conversión de imágenes de ultrasonido, además de permitir su envío directo al cliente a través de WhatsApp. Este conjunto de herramientas ha sido diseñado para facilitar la comunicación y el manejo de datos de ultrasonidos, mejorando así la experiencia tanto de profesionales de la salud como de pacientes.
+En el repositorio oficial para el Hackathon Talent Land, encontrarás el proyecto EnlaceDigna, que incluye una API REST y un chatbot. Esta API ofrece servicios para la extracción, compresión y conversión de imágenes de ultrasonido, además de permitir su envío directo al cliente a través de WhatsApp. Este conjunto de herramientas ha sido diseñado para facilitar la comunicación y el manejo de datos de ultrasonidos, mejorando así la experiencia tanto de profesionales de la salud como de pacientes.
 
 
 ##### Imagenes de muestra 
